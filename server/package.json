@@ -3,6 +3,15 @@
   "version": "1.0.0",
   "description": "server of web",
   "main": "index.js",
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node dist/index.js",
+    "server": "nodemon dist/index.js",
+    "start-ts": "ts-node src/index.ts",
+    "server-ts": "nodemon --exec ts-node src/index.ts",
+    "watch-ts": "tsc --w"
+  },
   "author": "Cong Son",
   "license": "MIT",
   "devDependencies": {
