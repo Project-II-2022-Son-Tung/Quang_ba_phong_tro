@@ -8,7 +8,7 @@ import {
   Param,
 } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
-import { ClientService } from './Client.service';
+import { ClientService } from './client.service';
 
 @JsonController('/clients')
 export class ClientController {
