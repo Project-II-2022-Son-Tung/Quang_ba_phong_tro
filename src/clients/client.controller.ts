@@ -6,8 +6,10 @@ import {
   BadRequestError,
   ForbiddenError,
   Param,
+  CurrentUser,
 } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
+import { CurrentUserOnRedisDocument } from 'src/user/currentUserOnRedis.interface';
 import { ClientService } from './client.service';
 
 @JsonController('/clients')
@@ -21,6 +23,7 @@ export class ClientController {
   @Authorized(['admin', 'client'])
   @Get('', { transformResponse: false })
   async getClientList(
+    @CurrentUser({ required: true }) user: CurrentUserOnRedisDocument,
     @QueryParam('page')
     page: number,
     @QueryParam('limit')
@@ -32,7 +35,13 @@ export class ClientController {
   ) {
     try {
       if (!page || !limit) return null;
-      return this.clientService.getClientList(page, limit, category, select);
+      return this.clientService.getClientList(
+        user.type,
+        page,
+        limit,
+        category,
+        select,
+      );
     } catch (e) {
       if (e instanceof ForbiddenError) throw new ForbiddenError(e.message);
       throw new BadRequestError(e.message);
@@ -45,9 +54,12 @@ export class ClientController {
   })
   @Authorized(['admin', 'client'])
   @Get('/:client_id', { transformResponse: false })
-  async getClientDetail(@Param('client_id') client_id: string) {
+  async getClientDetail(
+    @CurrentUser({ required: true }) user: CurrentUserOnRedisDocument,
+    @Param('client_id') client_id: string,
+  ) {
     try {
-      return this.clientService.getClientDetailById(client_id);
+      return this.clientService.getClientDetailById(user.type,client_id);
     } catch (e) {
       if (e instanceof ForbiddenError) throw new ForbiddenError(e.message);
       throw new BadRequestError(e.message);

@@ -30,8 +30,8 @@ export class ClientRepository {
   async getClientNumberWithFilter(query: {}): Promise<number> {
     return ClientModel.countDocuments(query);
   }
-  async getClientDetailById(client_id: string) {
-    return ClientModel.findById(client_id)
+  async getClientDetailById(query: {}) {
+    return ClientModel.findOne(query)
       .populate({ path: 'category', select: '-description' })
       .lean();
   }
