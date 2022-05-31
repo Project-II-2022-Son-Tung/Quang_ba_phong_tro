@@ -10,6 +10,7 @@ import axios from 'axios';
 import { BadRequestError } from 'routing-controllers';
 import { UserType } from './user-type.enum';
 import { toSlugConverter } from '../helper/toSlugConverter';
+import { CurrentUserOnRedisDocument } from './currentUserOnRedis.interface';
 
 export class UserService {
   private readonly userRepository = new UserRepository();
@@ -31,7 +32,7 @@ export class UserService {
   }
 
   async changeProfile(
-    user: UserDocument,
+    user: CurrentUserOnRedisDocument,
     changeProfileDto: ChangeProfileDto,
     avatar: Express.Multer.File,
   ) {

@@ -12,6 +12,7 @@ export class AuthRepository {
   }
 
   private generateToken(
+    user_id: string,
     email: string,
     role: string,
     secret: string,
@@ -19,6 +20,7 @@ export class AuthRepository {
   ): string {
     return sign(
       {
+        user_id,
         email,
         role,
       },
@@ -44,7 +46,7 @@ export class AuthRepository {
   async getUserPassword(email: string): Promise<UserDocument | null> {
     return UserModel.findOne({ email })
       .select({
-        _id: 0,
+        _id: 1,
         email: 1,
         hashed_password: 1,
         type: 1,
@@ -72,12 +74,14 @@ export class AuthRepository {
       } = process.env;
 
       const accessToken = this.generateToken(
+        user._id,
         email,
         role,
         JWT_SECRET,
         JWT_EXPIRES_IN,
       );
       const refreshToken = this.generateToken(
+        user._id,
         email,
         role,
         JWT_REFRESH_SECRET,
@@ -109,7 +113,7 @@ export class AuthRepository {
         ignoreExpiration: true,
       });
 
-      const { email, role } = tokenPayload;
+      const { user_id, email, role } = tokenPayload;
       const hasRefreshToken = await redisClient.exists(
         `auth:${email}:${refreshToken}`,
       );
@@ -122,12 +126,14 @@ export class AuthRepository {
       }
 
       const newAccessToken = this.generateToken(
+        user_id,
         email,
         role,
         JWT_SECRET,
         JWT_EXPIRES_IN,
       );
       const newRefreshToken = this.generateToken(
+        user_id,
         email,
         role,
         JWT_REFRESH_SECRET,

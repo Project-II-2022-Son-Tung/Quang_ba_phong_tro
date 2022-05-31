@@ -8,7 +8,7 @@ import { Types } from 'mongoose';
 import { SocialMediaContact } from '../social-media-contact/social-media-contact.model';
 import { Category } from '../category/category.model';
 import { User, UserModel } from '../user/user.model';
-import { UserSkill } from '../user/user-skill';
+import { SkillObjectOnDocuments } from '../user/skillObjectOnDocuments';
 
 export class Client extends User {
   @prop()
@@ -18,7 +18,7 @@ export class Client extends User {
   category?: Ref<Category>[];
 
   @prop({ required: false })
-  skill?: UserSkill[];
+  skill?: SkillObjectOnDocuments[];
 
   @prop({ default: 0 })
   successful_rate: number;

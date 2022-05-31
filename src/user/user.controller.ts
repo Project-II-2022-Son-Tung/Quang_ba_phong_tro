@@ -20,6 +20,7 @@ import { fileUploadOptions } from '../config/multer';
 import { EmailDto } from './dtos/email.dto';
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
 import { CreateUserDto } from './dtos/createUser.dto';
+import { CurrentUserOnRedisDocument } from './currentUserOnRedis.interface';
 
 @JsonController('/user')
 export class UserController {
@@ -31,7 +32,7 @@ export class UserController {
     description: 'Gets details of current logged-in user ',
   })
   @Authorized(['admin', 'client'])
-  getUserByEmail(@CurrentUser({ required: true }) user: UserDocument) {
+  getUserByEmail(@CurrentUser({ required: true }) user: CurrentUserOnRedisDocument) {
     return this.userService.getUserByEmailAndRole(user.email,user.type);
   }
 
@@ -55,7 +56,7 @@ export class UserController {
   @Authorized(['admin', 'client'])
   @Patch('/change/password')
   async changePassword(
-    @CurrentUser({ required: true }) user: UserDocument,
+    @CurrentUser({ required: true }) user: CurrentUserOnRedisDocument,
     @Body() changePasswordDto: ChangePasswordDto,
   ) {
     try {
@@ -76,7 +77,7 @@ export class UserController {
   @Put('/change/profile')
   async changeProfile(
     @Body() changeProfileDto: ChangeProfileDto,
-    @CurrentUser({ required: true }) user: UserDocument,
+    @CurrentUser({ required: true }) user: CurrentUserOnRedisDocument,
     @UploadedFile('avatar', { options: fileUploadOptions, required: false })
     avatar: Express.Multer.File,
   ) {

@@ -11,6 +11,7 @@ import { UserStatus } from './user-status.enum';
 import { UserType } from './user-type.enum';
 
 @modelOptions({
+  options: { allowMixed: 0 },
   schemaOptions: {
     discriminatorKey: 'type',
   },

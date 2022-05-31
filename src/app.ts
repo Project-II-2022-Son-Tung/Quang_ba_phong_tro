@@ -30,6 +30,8 @@ import { UserModel } from './user/user.model';
 import { CategoryController } from './category/category.controller';
 import { SkillController } from './skill/skill.controller';
 import { ClientController } from './clients/client.controller';
+import { ServiceProductController } from './serviceProduct/serviceProduct.controller';
+import { CurrentUserOnRedisDocument } from './user/currentUserOnRedis.interface';
 
 async function authorizationChecker(action: Action, roles: string[]) {
   const req: Request = action.request;
@@ -60,8 +62,11 @@ async function currentUserChecker(action: Action) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const curUser: any = jwt.decode(token);
   try {
-    // TODO: in prod: add filter: del_flag:false,status: 1
-    const user = await UserModel.findOne({ email: curUser.email }).lean();
+    const user = {
+      _id: curUser.user_id,
+      email: curUser.email,
+      type: curUser.role,
+    } as CurrentUserOnRedisDocument;
     return user;
   } catch (e) {
     return null;
@@ -103,7 +108,8 @@ async function bootstrap() {
       // GeoController,
       CategoryController,
       SkillController,
-      ClientController
+      ClientController,
+      ServiceProductController,
     ],
     authorizationChecker,
     currentUserChecker,

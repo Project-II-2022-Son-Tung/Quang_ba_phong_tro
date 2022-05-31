@@ -2,7 +2,7 @@ import { Expose, Type } from 'class-transformer';
 import { IsString, IsDateString, IsOptional, MaxLength, MinLength, IsNumber, IsPositive, IsMongoId, IsArray, ValidateNested, ArrayMinSize, ArrayMaxSize } from 'class-validator';
 import { Types } from 'mongoose';
 import { SocialMediaContact } from '../../social-media-contact/social-media-contact.model';
-import { UserSkill } from '../user-skill';
+import { SkillObjectOnDocuments } from '../skillObjectOnDocuments';
 
 export class ChangeProfileDto {
   @Expose()
@@ -50,8 +50,8 @@ export class ChangeProfileDto {
   @IsArray()
   @ArrayMaxSize(10)
   @ValidateNested({ each: true })
-  @Type(() => UserSkill)
-  skill: UserSkill[];
+  @Type(() => SkillObjectOnDocuments)
+  skill: SkillObjectOnDocuments[];
 
   @Expose()
   @IsOptional()
