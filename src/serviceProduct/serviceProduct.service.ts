@@ -4,9 +4,11 @@ import { ProductStatus } from '../product/product-status.enum';
 import { toSlugConverter } from '../helper/toSlugConverter';
 import { CreateServiceDto } from './dtos/createService.dto';
 import { ServiceProductRepository } from './serviceProduct.repository';
+import { AdminConfigService } from '../admin-config/adminConfig.service';
 
 export class ServiceProductService {
   private readonly serviceProductRepository = new ServiceProductRepository();
+  private readonly adminConfigService = new AdminConfigService();
 
   async createService(client_id: string, createServiceDto: CreateServiceDto) {
     if (
@@ -18,6 +20,10 @@ export class ServiceProductService {
         slug: toSlugConverter(obj.name),
       })); // TODO : log new skills added by user to admins
     }
+    Object.assign(createServiceDto, {
+      status:
+        await this.adminConfigService.getInitialCreateProductServiceStatus(),
+    });
     return this.serviceProductRepository.createService(
       client_id,
       createServiceDto,
@@ -250,8 +256,6 @@ export class ServiceProductService {
         updateOptions,
       ))
     )
-      throw new BadRequestError(
-        'Can not delete this service : Not found !',
-      );
+      throw new BadRequestError('Can not delete this service : Not found !');
   }
 }
