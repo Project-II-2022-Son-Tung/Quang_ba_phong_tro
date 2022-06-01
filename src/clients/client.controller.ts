@@ -59,7 +59,7 @@ export class ClientController {
     @Param('client_id') client_id: string,
   ) {
     try {
-      return this.clientService.getClientDetailById(user.type,client_id);
+      return this.clientService.getClientDetailById(user.type, client_id);
     } catch (e) {
       if (e instanceof ForbiddenError) throw new ForbiddenError(e.message);
       throw new BadRequestError(e.message);

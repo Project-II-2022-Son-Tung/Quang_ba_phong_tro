@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { registerDecorator, ValidationOptions, ValidationArguments } from 'class-validator';
 
 export function isNotLaterThan(numberOfMonth:number,validationOptions?: ValidationOptions) {
@@ -5,7 +6,7 @@ export function isNotLaterThan(numberOfMonth:number,validationOptions?: Validati
     registerDecorator({
       name: 'isNotLaterThan',
       target: object.constructor,
-      propertyName: propertyName,
+      propertyName,
       constraints: [numberOfMonth],
       options: validationOptions,
       validator: {

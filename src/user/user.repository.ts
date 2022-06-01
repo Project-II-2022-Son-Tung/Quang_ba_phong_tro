@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { hashSync, compareSync } from 'bcrypt';
 import { BadRequestError } from 'routing-controllers';
 import { v4 as uuidv4 } from 'uuid';

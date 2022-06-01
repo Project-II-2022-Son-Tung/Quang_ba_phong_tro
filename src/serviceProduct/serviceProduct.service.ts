@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable dot-notation */
 import { PopulateOptions } from 'mongoose';
 import { BadRequestError } from 'routing-controllers';
 import { ProductStatus } from '../product/product-status.enum';
@@ -51,6 +53,7 @@ export class ServiceProductService {
       Object.assign(query, {
         providing_method: { $in: providing_method.split(',') },
       });
+    // eslint-disable-next-line eqeqeq
     if (curUserType == 'client') {
       Object.assign(query, { status: ProductStatus.ACTIVE });
       if (selectQuery['status'] === 1) selectQuery['status'] = 0;
@@ -108,7 +111,7 @@ export class ServiceProductService {
       status: 1,
     };
     const populateQuery: PopulateOptions[] = [];
-    const sort_by: string = '';
+    const sort_by = '';
     const total =
       await this.serviceProductRepository.getNumberOfServiceWithFilter(query);
     const data = await this.serviceProductRepository.getServiceListWithPopulate(
@@ -250,8 +253,6 @@ export class ServiceProductService {
         updateOptions,
       ))
     )
-      throw new BadRequestError(
-        'Can not delete this service : Not found !',
-      );
+      throw new BadRequestError('Can not delete this service : Not found !');
   }
 }
