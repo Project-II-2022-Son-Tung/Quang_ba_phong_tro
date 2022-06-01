@@ -11,7 +11,6 @@ export class ServiceProductRepository {
   async createService(client_id: string, createServiceDto: CreateServiceDto) {
     await ServiceProductModel.create({
       user_id: client_id,
-      status: ProductStatus.ACTIVE,
       ...createServiceDto,
     });
   }
