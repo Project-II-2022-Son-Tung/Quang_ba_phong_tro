@@ -42,9 +42,7 @@ export class ServiceProductController {
   }
 
   @Get('', { transformResponse: false })
-  @Authorized(['admin', 'client'])
   @OpenAPI({
-    security: [{ BearerAuth: [] }],
     description: 'Get List Services',
   })
   async getServiceList(
@@ -64,14 +62,14 @@ export class ServiceProductController {
     sort_by: string,
     @QueryParam('select')
     select: string,
-    @CurrentUser({ required: true }) user: CurrentUserOnRedisDocument,
+    @CurrentUser({ required: false }) currentUser?: CurrentUserOnRedisDocument,
   ) {
     try {
       if (!page || !limit) return null;
       return this.serviceProductService.getServiceList(
         page,
         limit,
-        user.type,
+        currentUser,
         user_id,
         category,
         providing_method,
@@ -130,18 +128,16 @@ export class ServiceProductController {
   }
 
   @Get('/others/detail/:service_id', { transformResponse: false })
-  @Authorized(['client', 'admin'])
   @OpenAPI({
-    security: [{ BearerAuth: [] }],
     description: 'Get Service Details Of Other User',
   })
   async getOtherUserServiceDetail(
-    @CurrentUser({ required: true }) user: CurrentUserOnRedisDocument,
     @Param('service_id') service_id: string,
+    @CurrentUser({ required: false }) currentUser?: CurrentUserOnRedisDocument,
   ) {
     try {
       return this.serviceProductService.getOtherUserServiceDetail(
-        user.type,
+        currentUser,
         service_id,
       );
     } catch (e) {

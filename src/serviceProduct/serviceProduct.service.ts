@@ -5,6 +5,7 @@ import { toSlugConverter } from '../helper/toSlugConverter';
 import { CreateServiceDto } from './dtos/createService.dto';
 import { ServiceProductRepository } from './serviceProduct.repository';
 import { AdminConfigService } from '../admin-config/adminConfig.service';
+import { CurrentUserOnRedisDocument } from 'src/user/currentUserOnRedis.interface';
 
 export class ServiceProductService {
   private readonly serviceProductRepository = new ServiceProductRepository();
@@ -33,7 +34,7 @@ export class ServiceProductService {
   async getServiceList(
     page: number,
     limit: number,
-    curUserType: string,
+    currentUser: CurrentUserOnRedisDocument,
     user_id: string,
     category: string,
     providing_method: string,
@@ -41,7 +42,7 @@ export class ServiceProductService {
     sort_by: string,
     select: string,
   ) {
-    const query = { status: { $not: { $eq: ProductStatus.DELETED } } };
+    const query = { status: ProductStatus.ACTIVE };
     const selectQuery = {};
     const populateQuery: PopulateOptions[] = [
       {
@@ -57,9 +58,10 @@ export class ServiceProductService {
       Object.assign(query, {
         providing_method: { $in: providing_method.split(',') },
       });
-    if (curUserType == 'client') {
-      Object.assign(query, { status: ProductStatus.ACTIVE });
-      if (selectQuery['status'] === 1) selectQuery['status'] = 0;
+    if (currentUser && currentUser.type == 'admin') {
+      Object.assign(query, {
+        status: { $not: { $eq: ProductStatus.DELETED } },
+      });
     }
     if (fee_range) {
       const [minFee, maxFee] = fee_range.split('-').map(Number);
@@ -152,15 +154,19 @@ export class ServiceProductService {
     );
   }
 
-  async getOtherUserServiceDetail(user_type: string, service_id: string) {
+  async getOtherUserServiceDetail(
+    currentUser: CurrentUserOnRedisDocument,
+    service_id: string,
+  ) {
     const query = {
       _id: service_id,
-      status: { $not: { $eq: ProductStatus.DELETED } },
+      status: ProductStatus.ACTIVE,
     };
     const selectQuery = {};
-    if (user_type === 'client') {
-      Object.assign(query, { status: ProductStatus.ACTIVE });
-      Object.assign(selectQuery, { status: 0 });
+    if (currentUser && currentUser.type === 'admin') {
+      Object.assign(query, {
+        status: { $not: { $eq: ProductStatus.DELETED } },
+      });
     }
     const populateQuery: PopulateOptions[] = [
       {
