@@ -32,6 +32,7 @@ import { SkillController } from './skill/skill.controller';
 import { ClientController } from './clients/client.controller';
 import { ServiceProductController } from './serviceProduct/serviceProduct.controller';
 import { CurrentUserOnRedisDocument } from './user/currentUserOnRedis.interface';
+import { JobProductController } from './jobProduct/jobProduct.controller';
 
 async function authorizationChecker(action: Action, roles: string[]) {
   const req: Request = action.request;
@@ -57,11 +58,11 @@ async function authorizationChecker(action: Action, roles: string[]) {
 }
 async function currentUserChecker(action: Action) {
   const req: Request = action.request;
-  const authHeader = req.headers.authorization;
-  const [, token] = authHeader.split(' ');
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const curUser: any = jwt.decode(token);
   try {
+    const authHeader = req.headers.authorization;
+    const [, token] = authHeader.split(' ');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const curUser: any = jwt.decode(token);
     const user = {
       _id: curUser.user_id,
       email: curUser.email,
@@ -110,6 +111,7 @@ async function bootstrap() {
       SkillController,
       ClientController,
       ServiceProductController,
+      JobProductController,
     ],
     authorizationChecker,
     currentUserChecker,
