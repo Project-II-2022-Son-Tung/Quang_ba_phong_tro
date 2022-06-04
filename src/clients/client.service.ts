@@ -1,3 +1,4 @@
+import { CurrentUserOnRedisDocument } from '../user/currentUserOnRedis.interface';
 import { UserStatus } from '../user/user-status.enum';
 import { UserModelUnselectableFields } from '../user/user.model';
 import { ClientDocument } from './client.model';
@@ -7,17 +8,17 @@ export class ClientService {
   private readonly clientRepository = new ClientRepository();
 
   async getClientList(
-    user_type: string,
+    currentUser: CurrentUserOnRedisDocument,
     page: number,
     limit: number,
     category: string,
     select: string,
   ) {
-    const query = { del_flag: false };
+    const query = { del_flag: false, status: UserStatus.ACTIVE };
     const selectQuery = {};
     let populateCategory = false;
-    if (user_type==='client'){
-      Object.assign(query, { status: UserStatus.ACTIVE });
+    if (currentUser && currentUser.type === 'admin') {
+      delete query.status;
     }
     if (category) Object.assign(query, { $in: { category } });
     if (select) {
@@ -55,13 +56,17 @@ export class ClientService {
     };
   }
 
-  async getClientDetailById(user_type: string, client_id: string) {
+  async getClientDetailById(
+    currentUser: CurrentUserOnRedisDocument,
+    client_id: string,
+  ) {
     const query = {
       _id: client_id,
       del_flag: false,
+      status: UserStatus.ACTIVE,
     };
-    if (user_type === 'client') {
-      Object.assign(query, { status: UserStatus.ACTIVE });
+    if (currentUser && currentUser.type === 'admin') {
+      delete query.status;
     }
     return this.clientRepository.getClientDetailById(query);
   }
