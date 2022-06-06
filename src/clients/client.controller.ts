@@ -9,7 +9,7 @@ import {
   CurrentUser,
 } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
-import { CurrentUserOnRedisDocument } from 'src/user/currentUserOnRedis.interface';
+import { CurrentUserOnRedisDocument } from '../user/currentUserOnRedis.interface';
 import { ClientService } from './client.service';
 
 @JsonController('/clients')

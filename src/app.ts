@@ -32,6 +32,7 @@ import { SkillController } from './skill/skill.controller';
 import { ClientController } from './clients/client.controller';
 import { ServiceProductController } from './serviceProduct/serviceProduct.controller';
 import { CurrentUserOnRedisDocument } from './user/currentUserOnRedis.interface';
+import { OfferController } from './Offer/offer.controller';
 
 async function authorizationChecker(action: Action, roles: string[]) {
   const req: Request = action.request;
@@ -110,6 +111,7 @@ async function bootstrap() {
       SkillController,
       ClientController,
       ServiceProductController,
+      OfferController,
     ],
     authorizationChecker,
     currentUserChecker,

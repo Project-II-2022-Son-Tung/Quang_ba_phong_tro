@@ -55,7 +55,7 @@ export class Product {
 
   @prop({ default: Date.now() })
   create_time: Date;
-  
+
   @prop({ default: Date.now() })
   expiration_time: Date;
 
