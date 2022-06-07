@@ -82,7 +82,7 @@ class Mailer {
     const replacements = {
       user_name: `${name}`,
       user_email: `${receiver}`,
-      verify_token_site: `${process.env.CRM_WEBSITE_DOMAIN_PATH}/account/forgot-password/verify/${active_token}`,
+      verify_token_site: `${process.env.WEBSITE_DOMAIN_PATH}/account/forgot-password/verify/${active_token}`,
     };
     const htmlToSend = template(replacements);
     const transporter = nodemailer.createTransport({
