@@ -43,6 +43,10 @@ export class OfferRepository {
       .lean();
   }
 
+  async getOfferById(id: string): Promise<OfferDocument | null> {
+    return OfferModel.findById(id).lean();
+  }
+
   async updateOffer(
     offer_id: string,
     updateOfferDto: UpdateOfferDto,
@@ -76,5 +80,9 @@ export class OfferRepository {
       return offer.remove();
     }
     throw new Error('Offer not found or you do not have permision to delete');
+  }
+
+  async acceptOffer(offer_id: string): Promise<OfferDocument | null> {
+    return OfferModel.findByIdAndUpdate(offer_id, { status: 1 }, { new: true });
   }
 }

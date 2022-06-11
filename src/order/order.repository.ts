@@ -17,7 +17,7 @@ export class OrderRepository {
       .lean();
   }
 
-  async getOrdersWithPopulate(
+  async getOrdersWithClientPopulate(
     page: number,
     limit: number,
     query: {},
@@ -28,8 +28,27 @@ export class OrderRepository {
       .skip((page - 1) * limit)
       .limit(limit)
       .populate({ path: 'product_id', select: 'name description' })
-      .populate({ path: 'user_id', select: 'fullname avatar' })
+      .populate({ path: 'client_id', select: 'fullname avatar' })
       .lean();
+  }
+
+  async getOrdersWithProviderPopulate(
+    page: number,
+    limit: number,
+    query: {},
+    selectQuery: {},
+  ): Promise<OrderDocument[] | null> {
+    return OrderModel.find(query)
+      .select(selectQuery)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .populate({ path: 'product_id', select: 'name description' })
+      .populate({ path: 'provider_id', select: 'fullname avatar' })
+      .lean();
+  }
+
+  async getOrderByJobId(jobId: string): Promise<OrderDocument | null> {
+    return OrderModel.findOne({ job_id: jobId }).lean();
   }
 
   async getOrdersByUserId(

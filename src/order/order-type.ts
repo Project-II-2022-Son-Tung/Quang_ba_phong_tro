@@ -1,4 +1,4 @@
 export enum OrderType {
-  'Service',
-  'Job',
+  Service = 'Service',
+  Job = 'Job',
 }

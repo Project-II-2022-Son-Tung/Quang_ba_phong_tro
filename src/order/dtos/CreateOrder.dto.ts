@@ -33,5 +33,5 @@ export class CreateOrderDto {
 
   @Expose()
   @IsNotEmpty()
-  estimatedTime: number;
+  estimated_time: number;
 }

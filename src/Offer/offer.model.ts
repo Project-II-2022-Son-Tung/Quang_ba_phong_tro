@@ -19,7 +19,6 @@ import { OfferStatus } from './offer-status';
 export class Offer {
   @prop({
     required: true,
-    unique: true,
     type: Types.ObjectId,
     ref: () => Client,
   })

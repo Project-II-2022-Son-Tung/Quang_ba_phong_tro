@@ -20,7 +20,6 @@ import { OrderType } from './order-type';
 export class Order {
   @prop({
     required: true,
-    unique: true,
     type: Types.ObjectId,
     ref: () => Client,
   })
@@ -28,7 +27,6 @@ export class Order {
 
   @prop({
     required: true,
-    unique: true,
     type: Types.ObjectId,
     ref: () => Client,
   })
@@ -36,14 +34,13 @@ export class Order {
 
   @prop({
     required: true,
-    unique: true,
     type: Types.ObjectId,
     ref: () => Product,
   })
   product_id: Ref<Product>;
 
   @prop({ required: true, enum: OrderType })
-  type: string;
+  type: OrderType;
 
   @prop({ required: true, type: Number })
   price: number;
@@ -59,7 +56,7 @@ export class Order {
   note: string;
 
   @prop({ required: true, type: Number })
-  estimatedTime: number;
+  estimated_time: number;
 
   @prop({ required: true, type: Date, default: Date.now })
   create_time: Date;

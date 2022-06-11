@@ -157,4 +157,17 @@ export class OfferService {
     }
     throw new Error('Offer not found or you do not have permision to delete');
   }
+
+  async acceptOffer(
+    user_id: string,
+    offer_id: string,
+  ): Promise<OfferDocument | null> {
+    const offer = await this.offerRepository.getOfferById(offer_id);
+    const job = await ProductModel.findById(offer.job_id);
+    if (!job || job.status === 2) throw new Error('Job not found');
+    if (offer && offer.status === 0 && user_id === job.user_id.toString()) {
+      return this.offerRepository.acceptOffer(offer_id);
+    }
+    throw new Error('Offer not found or you do not have permision to accept');
+  }
 }
