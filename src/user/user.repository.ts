@@ -11,6 +11,8 @@ import { CreateUserDto } from './dtos/createUser.dto';
 import { UserType } from './user-type.enum';
 import { ClientModel } from '../clients/client.model';
 import { AdminModel } from './admin.model';
+import { sendCreateUserVerifyEmailQueue } from './queues/createUser/sendCreateUserVerifyEmail.queue';
+import { sendVerifySucceedEmailQueue } from './queues/verifySucceed/sendVerifySucceedEmail.queue';
 
 export class UserRepository {
   private hashPassword(password: string, rounds: number): string {
@@ -56,11 +58,11 @@ export class UserRepository {
     const userCreated = await user.save();
 
     if (userCreated) {
-      await Mailer.createNewUser(
-        userCreated.email,
-        userCreated.fullname,
-        `${process.env.WEBSITE_DOMAIN_PATH}/user/verify/${userCreated.active_token}`,
-      );
+      await sendCreateUserVerifyEmailQueue.add({
+        user_email: userCreated.email,
+        user_fullname: userCreated.fullname,
+        redirect_link: `${process.env.WEBSITE_DOMAIN_PATH}/user/verify/${userCreated.active_token}`,
+      });
     }
   }
 
@@ -90,7 +92,10 @@ export class UserRepository {
           'Activation unsuccesfully : invalid ActiveToken or user has been activated before! This error will also be thrown in the case that user has been deleted !',
         );
       }
-      await Mailer.verifySucceed(user.email, user.fullname);
+      await sendVerifySucceedEmailQueue.add({
+        user_email: user.email,
+        user_fullname: user.fullname,
+      });
       return 'Kích hoạt tài khoản thành công';
     } catch (e) {
       throw new BadRequestError(e.message);

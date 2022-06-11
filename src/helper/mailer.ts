@@ -10,6 +10,8 @@ class Mailer {
 
   private static readonly user = process.env.MAIL_USER as string;
 
+  private static readonly user_address = process.env.MAIL_USER_ADDRESS as string;
+
   private static readonly password = process.env.MAIL_PASS as string;
 
   public static async createNewUser(
@@ -36,7 +38,7 @@ class Mailer {
       },
     });
     const option = {
-      from: `"Niubi.vn" <${Mailer.user}>`,
+      from: `"Niubi.vn" <${Mailer.user_address}>`,
       to: receiver,
       subject: 'Đăng ký tài khoản mới tại Niubi.vn',
       html: htmlToSend,
@@ -63,7 +65,7 @@ class Mailer {
       },
     });
     const option = {
-      from: `"Niubi.vn" <${Mailer.user}>`,
+      from: `"Niubi.vn" <${Mailer.user_address}>`,
       to: receiver,
       subject: 'Kích hoạt tài khoản thành công',
       html: htmlToSend,
@@ -95,7 +97,7 @@ class Mailer {
       },
     });
     const option = {
-      from: `"Niubi.vn" <${Mailer.user}>`,
+      from: `"Niubi.vn" <${Mailer.user_address}>`,
       to: receiver,
       subject: 'Reset mật khẩu tài khoản',
       html: htmlToSend,
