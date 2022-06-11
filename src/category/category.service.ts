@@ -10,4 +10,8 @@ export class CategoryService {
   async getCategoryBySlug(slug: string): Promise<string | null> {
     return this.categoryRepository.getCategoryBySlug(slug);
   }
+
+  async getCategoriesIDBySlugString(slug: string): Promise<string[] | null> {
+    return this.categoryRepository.getCategoriesIDBySlugArray(slug.split(','));
+  }
 }

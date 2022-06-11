@@ -9,4 +9,11 @@ export class CategoryRepository {
     const category = await CategoryModel.findOne({ slug }).lean();
     return category?._id;
   }
+
+  async getCategoriesIDBySlugArray(slugs: string[]): Promise<string[] | null> {
+    const categories = await CategoryModel.find({
+      slug: { $in: slugs },
+    }).lean();
+    return categories.map((category) => category._id);
+  }
 }
