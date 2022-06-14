@@ -25,8 +25,6 @@ import { redisClient } from './config/redis-client';
 
 import { AuthController } from './auth/auth.controller';
 import { UserController } from './user/user.controller';
-import { GeoController } from './geo/geo.controller';
-import { UserModel } from './user/user.model';
 import { CategoryController } from './category/category.controller';
 import { SkillController } from './skill/skill.controller';
 import { ClientController } from './clients/client.controller';
@@ -34,6 +32,7 @@ import { ServiceProductController } from './serviceProduct/serviceProduct.contro
 import { CurrentUserOnRedisDocument } from './user/currentUserOnRedis.interface';
 import { JobProductController } from './jobProduct/jobProduct.controller';
 import { NewsController } from './news/news.controller';
+import { TicketController } from './ticket/ticket.controller';
 
 async function authorizationChecker(action: Action, roles: string[]) {
   const req: Request = action.request;
@@ -113,7 +112,8 @@ async function bootstrap() {
       ClientController,
       ServiceProductController,
       JobProductController,
-      NewsController
+      NewsController,
+      TicketController
     ],
     authorizationChecker,
     currentUserChecker,
