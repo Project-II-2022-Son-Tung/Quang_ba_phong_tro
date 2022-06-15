@@ -64,7 +64,7 @@ export class UserRepository {
       await sendRegisterUserVerifyEmailQueue.add({
         user_email: userCreated.email,
         user_fullname: userCreated.fullname,
-        redirect_link: `${process.env.WEBSITE_DOMAIN_PATH}/user/verify/${userCreated.active_token}`,
+        redirect_link: `${process.env.WEBSITE_DOMAIN_PATH}/user/register/verify/${userCreated.active_token}`,
       });
     }
   }
