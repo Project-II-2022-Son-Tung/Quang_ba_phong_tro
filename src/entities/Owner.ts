@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, OneToMany, BaseEntity } from "typeorm"
-import { Balance } from "./Balance"
+import { Wallet } from "./Wallet"
 import { Contract } from "./Contract";
 import { OwnerRate } from "./OwnerRate";
 import { Room } from "./Room";
@@ -57,10 +57,10 @@ export class Owner extends BaseEntity {
     @Column()
     phoneNumber!: string;
 
-    @Field(_type => Balance)
-    @OneToOne(() => Balance, {cascade: true})
+    @Field(_type => Wallet)
+    @OneToOne(() => Wallet, {cascade: true})
     @JoinColumn()
-    balance!: Balance;
+    wallet!: Wallet;
 
     @Field(_type => [OwnerRate], {nullable: true})
     @OneToMany(() => OwnerRate, (rate) => rate.owner)

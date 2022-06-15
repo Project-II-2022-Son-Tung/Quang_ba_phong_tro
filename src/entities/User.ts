@@ -1,11 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, OneToMany, BaseEntity } from "typeorm"
-import { Balance } from "./Balance"
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, OneToMany, BaseEntity } from "typeorm";
 import { Contract } from "./Contract";
 import { OwnerRate } from "./OwnerRate";
 import {Field, ObjectType, ID} from "type-graphql";
 import {Identification} from "./Identification";
 import { UserHistory } from "./UserHistory";
 import { Invite } from "./Invite";
+import { Wallet } from "./Wallet";
 
 @ObjectType()
 @Entity()
@@ -52,10 +52,10 @@ export class User extends BaseEntity {
     @Column()
     phoneNumber!: string;
 
-    @Field(_type=>Balance)
-    @OneToOne(() => Balance, {cascade: true})
+    @Field(_type=>Wallet)
+    @OneToOne(() => Wallet, {cascade: true})
     @JoinColumn()
-    balance!: Balance;
+    wallet!: Wallet;
 
     @Field(_type => [OwnerRate], {nullable: true})
     @OneToMany(() => OwnerRate, (rate) => rate.user)

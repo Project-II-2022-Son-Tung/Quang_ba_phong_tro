@@ -30,7 +30,7 @@ export class RoomRate extends BaseEntity {
     @JoinColumn()
     user!: User;
 
-    @Field()
+    @Field(_type => [RateImage])
     @OneToMany(()=> RateImage, (image) => image.rate)
     images!: RateImage[];
 
