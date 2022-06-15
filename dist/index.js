@@ -29,7 +29,7 @@ const main = async () => {
     app.use(express_1.default.json());
     app.set('trust proxy', 1);
     const redisClient = (0, redis_1.createClient)(constants_1.__prod__ ? {
-        url: process.env.REDIS_URL,
+        url: process.env.REDISCLOUD_URL,
         legacyMode: true
     } : {
         url: `redis://localhost:6379`,
