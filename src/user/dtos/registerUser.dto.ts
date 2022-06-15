@@ -1,7 +1,6 @@
 import { Expose } from 'class-transformer';
 import {
   IsEmail,
-  IsIn,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -9,14 +8,14 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class CreateUserDto {
+export class RegisterUserDto {
   @Expose()
   @IsNotEmpty()
   @IsEmail()
   email: string;
 
   @Expose()
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   @MinLength(4)
   @MaxLength(30)
@@ -25,10 +24,14 @@ export class CreateUserDto {
   @Expose()
   @IsOptional()
   @IsString()
+  @MaxLength(20)
+  @MinLength(10)
   phone: string;
 
   @Expose()
   @IsNotEmpty()
   @IsString()
+  @MaxLength(40)
+  @MinLength(1)
   fullname: string;
 }

@@ -14,7 +14,7 @@ class Mailer {
 
   private static readonly password = process.env.MAIL_PASS as string;
 
-  public static async createNewUser(
+  public static async registerNewUser(
     receiver: string,
     name: string,
     active_link: string,
@@ -102,6 +102,40 @@ class Mailer {
       subject: 'Reset mật khẩu tài khoản',
       html: htmlToSend,
     };
+    await transporter.sendMail(option);
+  }
+
+  public static async createAdminAccount(
+    receiver: string,
+    name: string,
+    raw_password: string,
+  ): Promise<void> {
+    const filePath = `${process.env.HTML_FILES_ROOT}/createNewAdmin.html`;
+    const source = readFileSync(filePath, 'utf-8').toString();
+    const template = handlebars.compile(source);
+    const replacements = {
+      user_email: `${receiver}`,
+      user_name: `${name} `,
+      user_raw_password: `${raw_password}`,
+      login_site: `${process.env.WEBSITE_DOMAIN_PATH}/auth/login`,
+    };
+    const htmlToSend = template(replacements);
+    const transporter = nodemailer.createTransport({
+      host: Mailer.host,
+      port: parseInt(Mailer.port, 10),
+      secure: false,
+      auth: {
+        user: Mailer.user,
+        pass: Mailer.password,
+      },
+    });
+    const option = {
+      from: `"Niubi.vn" <${Mailer.user_address}>`,
+      to: receiver,
+      subject: 'Thông tin tài khoản mới',
+      html: htmlToSend,
+    };
+
     await transporter.sendMail(option);
   }
 }
