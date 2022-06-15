@@ -6,6 +6,7 @@ import {
 } from '@typegoose/typegoose';
 import { Types } from 'mongoose';
 import { toSlugConverter } from '../helper/toSlugConverter';
+import { CategoryStatus } from './category-status.enum';
 
 export class Category {
   @prop({ required: true })
@@ -26,6 +27,12 @@ export class Category {
 
   @prop({ type: Types.ObjectId, ref: () => Category })
   parent_category: Ref<Category>;
+
+  @prop({ required: false, default: 1 })
+  priority: number;
+
+  @prop({ required: true, enum: CategoryStatus })
+  status: CategoryStatus;
 }
 
 export type CategoryDocument = DocumentType<Category>;
