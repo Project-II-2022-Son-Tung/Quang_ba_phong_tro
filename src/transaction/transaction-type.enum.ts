@@ -1,4 +1,4 @@
 export enum TransactionType {
-  'EXTERNAL',
-  'INTERNAL',
+  EXTERNAL = 'EXTERNAL',
+  INTERNAL = 'INTERNAL',
 }

@@ -16,5 +16,5 @@ export class WalletResponseDto {
   @Expose()
   @IsOptional()
   @Type(() => Wallet)
-  wallet: Wallet;
+  wallet?: Wallet;
 }

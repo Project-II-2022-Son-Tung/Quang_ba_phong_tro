@@ -11,6 +11,9 @@ import { ProductModel } from '../product/product.model';
 import { OrderType } from './order-type';
 import { OfferModel } from '../Offer/offer.model';
 import { OrderComplainModel } from './order-complain.model';
+import { WalletModel } from '../wallet/wallet.model';
+import { TransactionDirection } from '../transaction/transaction-direction';
+import { InternalTransModel } from '../transaction/internalTrans.model';
 
 export class OrderService {
   private readonly orderRepository = new OrderRepository();
@@ -151,6 +154,7 @@ export class OrderService {
   ): Promise<OrderDocument> {
     const currentOrder = await this.orderRepository.getOrderById(order_id);
     if (!currentOrder) throw new Error('Order not found');
+    const newCancelNote = `${cancelNote} (by ${user_type} ${user_id})`;
     if (user_type === 'admin') {
       if (currentOrder.status !== 0 && currentOrder.status !== 1)
         throw new Error('Order is not in pending or confirmed');
@@ -159,8 +163,8 @@ export class OrderService {
       try {
         const newOrder = await OrderModel.findByIdAndUpdate(
           order_id,
-          { status: 7, cancel_note: cancelNote },
-          { session },
+          { status: 7, cancel_note: newCancelNote },
+          { session, new: true },
         );
         await session.commitTransaction();
         session.endSession();
@@ -180,8 +184,8 @@ export class OrderService {
         try {
           const newOrder = await OrderModel.findByIdAndUpdate(
             order_id,
-            { status: 5, cancel_note: cancelNote },
-            { session },
+            { status: 5, cancel_note: newCancelNote },
+            { session, new: true },
           );
           await session.commitTransaction();
           session.endSession();
@@ -200,8 +204,8 @@ export class OrderService {
         try {
           const newOrder = await OrderModel.findByIdAndUpdate(
             order_id,
-            { status: 6, cancel_note: cancelNote },
-            { session },
+            { status: 6, cancel_note: newCancelNote },
+            { session, new: true },
           );
           await session.commitTransaction();
           session.endSession();
@@ -250,7 +254,52 @@ export class OrderService {
     }
     if (user_type === 'client') {
       if (currentOrder.client_id.toString() === user_id) {
-        return this.orderRepository.updateOrderStatus(order_id, 2);
+        const session = await startSession();
+        session.startTransaction();
+        try {
+          const amount = currentOrder.price;
+          const fee = Math.round(amount * parseFloat(process.env.FEE_AMOUNT));
+          await OrderModel.findByIdAndUpdate(
+            currentOrder._id,
+            {
+              status: 2,
+            },
+            { session, new: true },
+          );
+          const fromWallet = await WalletModel.findOneAndUpdate(
+            { user_id },
+            { $inc: { available_balance: -amount } },
+            { new: true, session },
+          );
+          if (!fromWallet) throw new Error('CLient Wallet not found');
+          const newTransaction = await InternalTransModel.create(
+            [
+              {
+                wallet_id: fromWallet._id,
+                ammount: amount,
+                direction: TransactionDirection.OUT,
+                fee,
+                order_id,
+                content: `Thanh toan don hang ${order_id} voi so Bi: ${amount} - Phi giao dich: ${fee} Bi. Thoi gian: ${new Date()}`,
+              },
+            ],
+            { session },
+          );
+          if (!newTransaction) throw new Error('Transaction not created');
+          const newOrder = await OrderModel.findByIdAndUpdate(
+            order_id,
+            { status: 3 },
+            { session, new: true },
+          );
+          if (!newOrder) throw new Error('Order not updated');
+          await session.commitTransaction();
+          session.endSession();
+          return newOrder;
+        } catch (err) {
+          await session.abortTransaction();
+          await session.endSession();
+          throw err;
+        }
       }
       throw new Error('You do not have permision to complete this order');
     }

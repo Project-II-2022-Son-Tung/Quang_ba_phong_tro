@@ -55,6 +55,9 @@ export class Order {
   @prop({ required: true, type: String })
   note: string;
 
+  @prop({ type: String, required: false })
+  cancel_note?: string;
+
   @prop({ required: true, type: Number })
   estimated_time: number;
 
