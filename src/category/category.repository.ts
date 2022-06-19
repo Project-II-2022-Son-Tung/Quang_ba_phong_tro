@@ -5,7 +5,7 @@ import { CreateCategoryDto } from './dtos/createCategory.dto';
 
 export class CategoryRepository {
   async getAllCategories(): Promise<CategoryDocument[] | null> {
-    return CategoryModel.find({ status: CategoryStatus.ACTIVE }).sort('- priority').lean();
+    return CategoryModel.find({ status: CategoryStatus.ACTIVE }).sort('-priority').lean();
   }
 
   async getCategoryBySlug(slug: string): Promise<string | null> {
