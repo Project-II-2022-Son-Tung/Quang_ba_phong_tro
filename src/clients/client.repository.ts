@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { ClientDocument, ClientModel } from './client.model';
 
 export class ClientRepository {
@@ -14,6 +15,7 @@ export class ClientRepository {
       .populate({ path: 'category', select: '-description' })
       .lean();
   }
+
   async getClientListWithNoPopulate(
     page: number,
     limit: number,
@@ -30,6 +32,7 @@ export class ClientRepository {
   async getClientNumberWithFilter(query: {}): Promise<number> {
     return ClientModel.countDocuments(query);
   }
+  
   async getClientDetailById(query: {}) {
     return ClientModel.findOne(query)
       .populate({ path: 'category', select: '-description' })

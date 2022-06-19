@@ -1,3 +1,5 @@
+/* eslint-disable func-names */
+/* eslint-disable object-shorthand */
 import { DocumentType, getModelForClass, prop } from '@typegoose/typegoose';
 import { toSlugConverter } from '../helper/toSlugConverter';
 

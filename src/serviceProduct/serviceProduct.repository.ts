@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { PopulateOptions, UpdateQuery } from 'mongoose';
 import { ProductStatus } from '../product/product-status.enum';
 import { CreateServiceDto } from './dtos/createService.dto';

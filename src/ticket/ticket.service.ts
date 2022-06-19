@@ -2,7 +2,7 @@ import { TicketRepository } from './ticket.repository';
 import { TicketDocument } from './ticket.model';
 import { CreateTicketDto } from './dtos/createTicket.dto';
 import { CreateTicketMessageDto } from './dtos/createTicketMessage.dto';
-import { CurrentUserOnRedisDocument } from 'src/user/currentUserOnRedis.interface';
+import { CurrentUserOnRedisDocument } from '../user/currentUserOnRedis.interface';
 import { TicketStatus } from './ticket-status.enum';
 
 export class TicketService {

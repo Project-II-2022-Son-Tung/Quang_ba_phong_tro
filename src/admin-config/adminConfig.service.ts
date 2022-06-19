@@ -1,9 +1,9 @@
-import { ProductStatus } from 'src/product/product-status.enum';
+import { ProductStatus } from '../product/product-status.enum';
 import { AdminConfigRepository } from './adminConfig.repository';
 
 export class AdminConfigService {
   private readonly adminConfigRepository = new AdminConfigRepository();
-  
+
   async getInitialCreateProductServiceStatus(): Promise<ProductStatus> {
     const query = { name: 'initialCreateServiceProduct' };
     const adminConfig = await this.adminConfigRepository.getAdminConfig(query);

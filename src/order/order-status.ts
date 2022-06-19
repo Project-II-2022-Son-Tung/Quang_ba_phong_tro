@@ -1,0 +1,10 @@
+export enum OrderStatus {
+  PENDING,
+  ACCEPTED,
+  FINISHED,
+  PAID,
+  COMPLAINING,
+  CANCELED,
+  DENIED,
+  CLOSED,
+}

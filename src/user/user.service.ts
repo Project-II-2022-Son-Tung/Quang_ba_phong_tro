@@ -1,13 +1,14 @@
+/* eslint-disable no-param-reassign */
+import FormData from 'form-data';
+import { createReadStream, unlink } from 'fs';
+import axios from 'axios';
+import { BadRequestError } from 'routing-controllers';
 import { UserRepository } from './user.repository';
 import { ChangePasswordDto } from './dtos/changePassword.dto';
 import { ChangeProfileDto } from './dtos/changeProfile.dto';
 import { UserDocument } from './user.model';
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
 import { RegisterUserDto } from './dtos/registerUser.dto';
-import FormData from 'form-data';
-import { createReadStream, unlink } from 'fs';
-import axios from 'axios';
-import { BadRequestError } from 'routing-controllers';
 import { UserType } from './user-type.enum';
 import { toSlugConverter } from '../helper/toSlugConverter';
 import { CurrentUserOnRedisDocument } from './currentUserOnRedis.interface';
@@ -75,7 +76,7 @@ export class UserService {
     }
     if (user.type === UserType.CLIENT)
       return this.userRepository.changeClientProfile(query, changeProfileDto);
-    else return this.userRepository.changeAdminProfile(query, changeProfileDto);
+    return this.userRepository.changeAdminProfile(query, changeProfileDto);
   }
 
   async verifyActive(activeToken: string) {

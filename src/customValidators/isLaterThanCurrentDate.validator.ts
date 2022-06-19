@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { registerDecorator, ValidationOptions, ValidationArguments } from 'class-validator';
 
 export function isLaterThanCurrentDate(validationOptions?: ValidationOptions) {
@@ -5,7 +6,7 @@ export function isLaterThanCurrentDate(validationOptions?: ValidationOptions) {
     registerDecorator({
       name: 'isLaterThanCurrentDate',
       target: object.constructor,
-      propertyName: propertyName,
+      propertyName,
       constraints: [],
       options: validationOptions,
       validator: {

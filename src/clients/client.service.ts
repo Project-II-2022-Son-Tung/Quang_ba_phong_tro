@@ -1,4 +1,5 @@
 import { CurrentUserOnRedisDocument } from '../user/currentUserOnRedis.interface';
+/* eslint-disable dot-notation */
 import { UserStatus } from '../user/user-status.enum';
 import { UserModelUnselectableFields } from '../user/user.model';
 import { ClientDocument } from './client.model';

@@ -12,6 +12,7 @@ import {
 import { OpenAPI } from 'routing-controllers-openapi';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto as ChangeCategoryDetailDto } from './dtos/createCategory.dto';
+
 @JsonController('/categories')
 export class CategoryController {
   private readonly categoryService = new CategoryService();

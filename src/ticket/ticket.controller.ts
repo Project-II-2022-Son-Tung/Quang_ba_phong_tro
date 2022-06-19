@@ -17,7 +17,7 @@ import { CreateTicketDto } from './dtos/createTicket.dto';
 import { TicketService } from './ticket.service';
 import { fileUploadOptions } from '../config/multer';
 import { CreateTicketMessageDto } from './dtos/createTicketMessage.dto';
-import { CurrentUserOnRedisDocument } from 'src/user/currentUserOnRedis.interface';
+import { CurrentUserOnRedisDocument } from '../user/currentUserOnRedis.interface';
 
 @JsonController('/tickets')
 export class TicketController {

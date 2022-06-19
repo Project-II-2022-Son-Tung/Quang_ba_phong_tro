@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { hashSync, compareSync } from 'bcrypt';
 import { BadRequestError } from 'routing-controllers';
 import { v4 as uuidv4 } from 'uuid';
+import cryptoRandomString from 'crypto-random-string';
 import { UserDocument, UserModel } from './user.model';
 import { ChangeProfileDto } from './dtos/changeProfile.dto';
 import { ChangePasswordDto } from './dtos/changePassword.dto';
@@ -13,7 +15,6 @@ import { ClientModel } from '../clients/client.model';
 import { AdminModel } from './admin.model';
 import { sendRegisterUserVerifyEmailQueue } from './queues/registerUser/sendRegisterUserVerifyEmail.queue';
 import { sendVerifySucceedEmailQueue } from './queues/verifySucceed/sendVerifySucceedEmail.queue';
-import cryptoRandomString from 'crypto-random-string';
 import { CreateUserDto } from './dtos/createUser.dto';
 import { sendCreateNewAdminAccountEmailQueue } from './queues/createUser/sendCreateNewAdminAccountEmail.queue';
 

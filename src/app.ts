@@ -33,6 +33,10 @@ import { CurrentUserOnRedisDocument } from './user/currentUserOnRedis.interface'
 import { JobProductController } from './jobProduct/jobProduct.controller';
 import { NewsController } from './news/news.controller';
 import { TicketController } from './ticket/ticket.controller';
+import { OfferController } from './Offer/offer.controller';
+import { OrderController } from './order/order.controller';
+import { WalletController } from './wallet/wallet.controller';
+import { TransactionController } from './transaction/transaction.controller';
 
 async function authorizationChecker(action: Action, roles: string[]) {
   const req: Request = action.request;
@@ -113,7 +117,11 @@ async function bootstrap() {
       ServiceProductController,
       JobProductController,
       NewsController,
-      TicketController
+      TicketController,
+      OfferController,
+      OrderController,
+      WalletController,
+      TransactionController,
     ],
     authorizationChecker,
     currentUserChecker,

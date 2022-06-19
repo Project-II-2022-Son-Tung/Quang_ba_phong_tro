@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
+/* eslint-disable dot-notation */
+/* eslint-disable no-param-reassign */
 import { PopulateOptions } from 'mongoose';
 import { BadRequestError } from 'routing-controllers';
 import { ProductStatus } from '../product/product-status.enum';
@@ -6,10 +9,11 @@ import { CreateJobDto } from './dtos/createJob.dto';
 import { JobProductRepository } from './jobProduct.repository';
 import { AdminConfigService } from '../admin-config/adminConfig.service';
 import { ChangeJobDetailDto } from './dtos/changeJobDetail.dto';
-import { CurrentUserOnRedisDocument } from 'src/user/currentUserOnRedis.interface';
+import { CurrentUserOnRedisDocument } from '../user/currentUserOnRedis.interface';
 
 export class JobProductService {
   private readonly jobProductRepository = new JobProductRepository();
+
   private readonly adminConfigService = new AdminConfigService();
 
   async createJob(client_id: string, createJobDto: CreateJobDto) {
