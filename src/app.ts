@@ -22,7 +22,6 @@ import { isJWT } from 'class-validator';
 import * as http from 'http';
 import * as socketio from 'socket.io';
 import { redisClient } from './config/redis-client';
-
 import { AuthController } from './auth/auth.controller';
 import { UserController } from './user/user.controller';
 import { CategoryController } from './category/category.controller';
@@ -37,6 +36,7 @@ import { OfferController } from './Offer/offer.controller';
 import { OrderController } from './order/order.controller';
 import { WalletController } from './wallet/wallet.controller';
 import { TransactionController } from './transaction/transaction.controller';
+import agenda from './agenda';
 
 async function authorizationChecker(action: Action, roles: string[]) {
   const req: Request = action.request;
@@ -92,7 +92,7 @@ async function bootstrap() {
   await redisClient.connect();
   const app = express();
   const env: 'development' | 'production' = app.get('env');
-
+  await agenda.start();
   app.use(
     helmet({
       contentSecurityPolicy: false,

@@ -13,6 +13,7 @@ import {
   UploadedFiles,
 } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
+import agenda from '../agenda';
 import { fileUploadOptions } from '../config/multer';
 import { CurrentUserOnRedisDocument } from '../user/currentUserOnRedis.interface';
 import { OrderService } from './order.service';
@@ -173,9 +174,16 @@ export class OrderController {
     images: Express.Multer.File[],
   ) {
     try {
+      const jobs = await agenda.jobs({
+        name: 'auto complete order',
+        data: job_order_id,
+      });
+      if (jobs.length > 0) {
+        jobs[0].remove();
+      }
       console.log(images);
       console.log(body);
-      return;
+      return 'ds';
       // return this.orderService.complainOrder(
       //   user.type,
       //   user._id,
@@ -189,3 +197,4 @@ export class OrderController {
     }
   }
 }
+

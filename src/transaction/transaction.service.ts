@@ -120,6 +120,7 @@ export class TransactionService {
 
   async acceptTransaction(
     user_type: string,
+    userId: string,
     transaction_id: string,
   ): Promise<InternalTransDocument | null> {
     if (user_type !== 'admin') {
@@ -139,7 +140,7 @@ export class TransactionService {
       }
       await InternalTransModel.updateOne(
         { _id: transaction_id },
-        { status: TransactionStatus.CONFIRMED },
+        { status: TransactionStatus.CONFIRMED, admin_id: userId },
         { session },
       );
       const wallet = await WalletModel.findByIdAndUpdate(
@@ -172,6 +173,7 @@ export class TransactionService {
       const newTransaction = await InternalTransModel.create(
         [
           {
+            admin_id: userId,
             wallet_id: provider_wallet._id,
             ammount: transaction.ammount,
             direction: TransactionDirection.IN,

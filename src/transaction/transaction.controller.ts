@@ -149,6 +149,7 @@ export class TransactionController {
     try {
       return this.transactionService.acceptTransaction(
         user.type,
+        user._id,
         transaction_id,
       );
     } catch (e) {

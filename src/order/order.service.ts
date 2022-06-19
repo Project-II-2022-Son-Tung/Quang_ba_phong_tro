@@ -14,6 +14,7 @@ import { OrderComplainModel } from './order-complain.model';
 import { WalletModel } from '../wallet/wallet.model';
 import { TransactionDirection } from '../transaction/transaction-direction';
 import { InternalTransModel } from '../transaction/internalTrans.model';
+import agenda from '../agenda';
 
 export class OrderService {
   private readonly orderRepository = new OrderRepository();
@@ -158,6 +159,13 @@ export class OrderService {
     if (user_type === 'admin') {
       if (currentOrder.status !== 0 && currentOrder.status !== 1)
         throw new Error('Order is not in pending or confirmed');
+      const jobs = await agenda.jobs({
+        name: 'auto complete order',
+        data: order_id,
+      });
+      if (jobs.length > 0) {
+        jobs[0].remove();
+      }
       const session = await startSession();
       session.startTransaction();
       try {
@@ -199,6 +207,13 @@ export class OrderService {
       if (currentOrder.provider_id.toString() === user_id) {
         if (currentOrder.status !== 0 && currentOrder.status !== 1)
           throw new Error('Order is not in pending or confirmed');
+        const jobs = await agenda.jobs({
+          name: 'auto complete order',
+          data: order_id,
+        });
+        if (jobs.length > 0) {
+          jobs[0].remove();
+        }
         const session = await startSession();
         session.startTransaction();
         try {
@@ -230,10 +245,12 @@ export class OrderService {
     if (!currentOrder) throw new Error('Order not found');
     if (currentOrder.status !== 0) throw new Error('Order is not in pending');
     if (user_type === 'admin') {
+      await agenda.schedule('in 72 hours', 'auto complete order', order_id);
       return this.orderRepository.updateOrderStatus(order_id, 1);
     }
     if (user_type === 'client') {
       if (currentOrder.provider_id.toString() === user_id) {
+        await agenda.schedule('in 72 hours', 'auto complete order', order_id);
         return this.orderRepository.updateOrderStatus(order_id, 1);
       }
       throw new Error('You do not have permision to confirm this order');
@@ -250,7 +267,59 @@ export class OrderService {
     if (!currentOrder) throw new Error('Order not found');
     if (currentOrder.status !== 1) throw new Error('Order is not in confirmed');
     if (user_type === 'admin') {
-      return this.orderRepository.updateOrderStatus(order_id, 2);
+      const session = await startSession();
+      session.startTransaction();
+      try {
+        const amount = currentOrder.price;
+        const fee = Math.round(amount * parseFloat(process.env.FEE_AMOUNT));
+        await OrderModel.findByIdAndUpdate(
+          currentOrder._id,
+          {
+            status: 2,
+          },
+          { session, new: true },
+        );
+        const fromWallet = await WalletModel.findOneAndUpdate(
+          { user_id: currentOrder.client_id.toString() },
+          { $inc: { available_balance: -amount } },
+          { new: true, session },
+        );
+        if (!fromWallet) throw new Error('CLient Wallet not found');
+        const newTransaction = await InternalTransModel.create(
+          [
+            {
+              wallet_id: fromWallet._id,
+              ammount: amount,
+              direction: TransactionDirection.OUT,
+              fee,
+              order_id,
+              content: `Thanh toan don hang ${order_id} voi so Bi: ${amount} - Phi giao dich: ${fee} Bi. Thoi gian: ${new Date()}`,
+            },
+          ],
+          { session },
+        );
+        if (!newTransaction) throw new Error('Transaction not created');
+        const newOrder = await OrderModel.findByIdAndUpdate(
+          order_id,
+          { status: 3 },
+          { session, new: true },
+        );
+        if (!newOrder) throw new Error('Order not updated');
+        await session.commitTransaction();
+        session.endSession();
+        const jobs = await agenda.jobs({
+          name: 'auto complete order',
+          data: order_id,
+        });
+        if (jobs.length > 0) {
+          jobs[0].remove();
+        }
+        return newOrder;
+      } catch (err) {
+        await session.abortTransaction();
+        await session.endSession();
+        throw err;
+      }
     }
     if (user_type === 'client') {
       if (currentOrder.client_id.toString() === user_id) {
@@ -294,6 +363,13 @@ export class OrderService {
           if (!newOrder) throw new Error('Order not updated');
           await session.commitTransaction();
           session.endSession();
+          const jobs = await agenda.jobs({
+            name: 'auto complete order',
+            data: order_id,
+          });
+          if (jobs.length > 0) {
+            jobs[0].remove();
+          }
           return newOrder;
         } catch (err) {
           await session.abortTransaction();
