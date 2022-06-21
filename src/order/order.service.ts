@@ -1,9 +1,13 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable dot-notation */
 /* eslint-disable no-else-return */
 /* eslint-disable @typescript-eslint/ban-types */
 import { startSession } from 'mongoose';
 import FormData from 'form-data';
 import axios from 'axios';
+import { BadRequestError } from 'routing-controllers';
+import { createReadStream, unlink } from 'fs';
 import { OrderRepository } from './order.repository';
 import { OrderDocument, OrderModel } from './order.model';
 import { OfferRepository } from '../Offer/offer.repository';
@@ -387,7 +391,7 @@ export class OrderService {
     user_id: string,
     order_id: string,
     complain: string,
-    images: Express.Multer.File[],
+    images: Array<Express.Multer.File>,
   ): Promise<OrderDocument> {
     const currentOrder = await this.orderRepository.getOrderById(order_id);
     if (!currentOrder) throw new Error('Order not found');
@@ -400,30 +404,42 @@ export class OrderService {
         const session = await startSession();
         session.startTransaction();
         try {
-          const form = new FormData();
-          const imagesrcs = [];
-          images.forEach(async (image) => {
-            form.append('images', image.buffer);
-          });
-          const mediaResponse = await axios.post<string>(
-            `${process.env.MEDIA_ROOT_URL}/file`,
-            form,
-            {
-              headers: { ...form.getHeaders() },
-            },
-          );
-          imagesrcs.push(mediaResponse.data);
-          await OrderComplainModel.create(
+          const complainToCreate = new OrderComplainModel(
             [
               {
                 order_id,
                 client_id: user_id,
                 complain,
-                images: imagesrcs,
               },
             ],
             { session },
           );
+          const imageStringArray: string[] = [];
+          if (images) {
+            for (const singleImage of images) {
+              try {
+                const form = new FormData();
+                form.append('objectType', 'order');
+                form.append('objectId', complainToCreate._id.toString());
+                form.append('file', createReadStream(singleImage.path));
+                const mediaResponse = await axios.post<string>(
+                  `${process.env.MEDIA_ROOT_URL}/file`,
+                  form,
+                  {
+                    headers: { ...form.getHeaders() },
+                  },
+                );
+                imageStringArray.push(mediaResponse.data);
+              } catch (e) {
+                throw new BadRequestError(e.message);
+              } finally {
+                unlink(singleImage.path, () => null);
+              }
+            }
+            if (imageStringArray.length)
+              complainToCreate.images = imageStringArray;
+          }
+          await complainToCreate.save();
           const newOrder = await OrderModel.findByIdAndUpdate(
             order_id,
             { status: 4 },
