@@ -84,9 +84,7 @@ const main = async () => {
 		}),
 		context: ({ req, res }): MyContext => ({ req, res, connection: AppDataSource.manager }),
 		plugins: [__prod__ 
-				  ? ApolloServerPluginLandingPageProductionDefault({
-					footer: false,
-				  })
+				  ? ApolloServerPluginLandingPageGraphQLPlayground()
 				  : ApolloServerPluginLandingPageGraphQLPlayground()],
 		
 	});
