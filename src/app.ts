@@ -25,8 +25,6 @@ import { redisClient } from './config/redis-client';
 
 import { AuthController } from './auth/auth.controller';
 import { UserController } from './user/user.controller';
-import { GeoController } from './geo/geo.controller';
-import { UserModel } from './user/user.model';
 import { CategoryController } from './category/category.controller';
 import { SkillController } from './skill/skill.controller';
 import { ClientController } from './clients/client.controller';
@@ -106,7 +104,6 @@ async function bootstrap() {
     controllers: [
       UserController,
       AuthController,
-      // GeoController,
       CategoryController,
       SkillController,
       ClientController,

@@ -6,8 +6,8 @@ export class Skill {
   name: string;
 
   @prop({
-    default: function (this: DocumentType<Skill>) {
-      return `${toSlugConverter(this.name)}`;
+    default: function getDefaultSkillSlug(this: DocumentType<Skill>) {
+      return toSlugConverter(this.name);
     },
   })
   slug: string;

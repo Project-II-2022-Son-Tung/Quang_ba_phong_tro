@@ -12,8 +12,9 @@ export class Category {
   name: string;
 
   @prop({
-    default: function (this: DocumentType<Category>) {
-      return `${toSlugConverter(this.name)}`;
+    // eslint-disable-next-line object-shorthand
+    default: function getDefaultCategorySlug(this: DocumentType<Category>) {
+      return toSlugConverter(this.name);
     },
   })
   slug: string;

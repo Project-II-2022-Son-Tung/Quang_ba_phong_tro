@@ -1,7 +1,6 @@
 import {
   JsonController,
   Get,
-  Authorized,
   QueryParam,
   BadRequestError,
   ForbiddenError,

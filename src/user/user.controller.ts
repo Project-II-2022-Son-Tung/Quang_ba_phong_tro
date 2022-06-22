@@ -13,7 +13,6 @@ import {
 } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
 import { UserService } from './user.service';
-import { UserDocument } from './user.model';
 import { ChangePasswordDto } from './dtos/changePassword.dto';
 import { ChangeProfileDto } from './dtos/changeProfile.dto';
 import { fileUploadOptions } from '../config/multer';
@@ -32,8 +31,10 @@ export class UserController {
     description: 'Gets details of current logged-in user ',
   })
   @Authorized(['admin', 'client'])
-  getUserByEmail(@CurrentUser({ required: true }) user: CurrentUserOnRedisDocument) {
-    return this.userService.getUserByEmailAndRole(user.email,user.type);
+  getUserByEmail(
+    @CurrentUser({ required: true }) user: CurrentUserOnRedisDocument,
+  ) {
+    return this.userService.getUserByEmailAndRole(user.email, user.type);
   }
 
   @Post('', { transformResponse: false })

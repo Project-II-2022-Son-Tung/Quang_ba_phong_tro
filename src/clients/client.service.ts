@@ -15,7 +15,10 @@ export class ClientService {
     select: string,
   ) {
     const query = { del_flag: false, status: UserStatus.ACTIVE };
-    const selectQuery = {};
+    const selectQuery: {
+      category?: number;
+      [query: string]: number;
+    } = {};
     let populateCategory = false;
     if (currentUser && currentUser.type === 'admin') {
       delete query.status;
@@ -27,7 +30,7 @@ export class ClientService {
         if (!UserModelUnselectableFields.includes(value))
           selectQuery[value] = 1;
       });
-      if (selectQuery['category'] === 1) populateCategory = true;
+      if (selectQuery?.category === 1) populateCategory = true;
     }
     const total = await this.clientRepository.getClientNumberWithFilter(query);
     let data: ClientDocument[];

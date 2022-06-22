@@ -1,14 +1,16 @@
+/* eslint-disable no-param-reassign */
 import { PopulateOptions } from 'mongoose';
 import { BadRequestError } from 'routing-controllers';
+import { CurrentUserOnRedisDocument } from '../user/currentUserOnRedis.interface';
 import { ProductStatus } from '../product/product-status.enum';
 import { toSlugConverter } from '../helper/toSlugConverter';
 import { CreateServiceDto } from './dtos/createService.dto';
 import { ServiceProductRepository } from './serviceProduct.repository';
 import { AdminConfigService } from '../admin-config/adminConfig.service';
-import { CurrentUserOnRedisDocument } from 'src/user/currentUserOnRedis.interface';
 
 export class ServiceProductService {
   private readonly serviceProductRepository = new ServiceProductRepository();
+
   private readonly adminConfigService = new AdminConfigService();
 
   async createService(client_id: string, createServiceDto: CreateServiceDto) {
@@ -43,7 +45,10 @@ export class ServiceProductService {
     select: string,
   ) {
     const query = { status: ProductStatus.ACTIVE };
-    const selectQuery = {};
+    const selectQuery: {
+      category?: number;
+      user_id?: number;
+    } = {};
     const populateQuery: PopulateOptions[] = [
       {
         path: 'user_id',
@@ -58,7 +63,7 @@ export class ServiceProductService {
       Object.assign(query, {
         providing_method: { $in: providing_method.split(',') },
       });
-    if (currentUser && currentUser.type == 'admin') {
+    if (currentUser && currentUser.type === 'admin') {
       Object.assign(query, {
         status: { $not: { $eq: ProductStatus.DELETED } },
       });
@@ -75,8 +80,8 @@ export class ServiceProductService {
       fieldsArray.forEach((value) => {
         selectQuery[value] = 1;
       });
-      if (!selectQuery['category']) populateQuery.pop();
-      if (!selectQuery['user_id']) populateQuery.shift();
+      if (!selectQuery.category) populateQuery.pop();
+      if (!selectQuery.user_id) populateQuery.shift();
     }
     const total =
       await this.serviceProductRepository.getNumberOfServiceWithFilter(query);
@@ -116,7 +121,7 @@ export class ServiceProductService {
       status: 1,
     };
     const populateQuery: PopulateOptions[] = [];
-    const sort_by: string = '';
+    const sort_by = '';
     const total =
       await this.serviceProductRepository.getNumberOfServiceWithFilter(query);
     const data = await this.serviceProductRepository.getServiceListWithPopulate(

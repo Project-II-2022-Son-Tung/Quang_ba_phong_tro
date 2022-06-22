@@ -1,15 +1,17 @@
+/* eslint-disable no-param-reassign */
 import { PopulateOptions } from 'mongoose';
 import { BadRequestError } from 'routing-controllers';
+import { CurrentUserOnRedisDocument } from 'src/user/currentUserOnRedis.interface';
 import { ProductStatus } from '../product/product-status.enum';
 import { toSlugConverter } from '../helper/toSlugConverter';
 import { CreateJobDto } from './dtos/createJob.dto';
 import { JobProductRepository } from './jobProduct.repository';
 import { AdminConfigService } from '../admin-config/adminConfig.service';
 import { ChangeJobDetailDto } from './dtos/changeJobDetail.dto';
-import { CurrentUserOnRedisDocument } from 'src/user/currentUserOnRedis.interface';
 
 export class JobProductService {
   private readonly jobProductRepository = new JobProductRepository();
+
   private readonly adminConfigService = new AdminConfigService();
 
   async createJob(client_id: string, createJobDto: CreateJobDto) {
@@ -37,7 +39,11 @@ export class JobProductService {
     select: string,
   ) {
     const query = { status: ProductStatus.ACTIVE };
-    const selectQuery = {};
+    const selectQuery: {
+      category?: number;
+      user_id?: number;
+      [query: string]: number;
+    } = {};
     const populateQuery: PopulateOptions[] = [
       {
         path: 'user_id',
@@ -69,8 +75,8 @@ export class JobProductService {
       fieldsArray.forEach((value) => {
         selectQuery[value] = 1;
       });
-      if (!selectQuery['category']) populateQuery.pop();
-      if (!selectQuery['user_id']) populateQuery.shift();
+      if (!selectQuery.category) populateQuery.pop();
+      if (!selectQuery.user_id) populateQuery.shift();
     }
     const total = await this.jobProductRepository.getNumberOfJobWithFilter(
       query,
@@ -110,7 +116,7 @@ export class JobProductService {
       status: 1,
     };
     const populateQuery: PopulateOptions[] = [];
-    const sort_by: string = '';
+    const sort_by = '';
     const total = await this.jobProductRepository.getNumberOfJobWithFilter(
       query,
     );

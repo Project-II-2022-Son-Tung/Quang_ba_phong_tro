@@ -17,8 +17,8 @@ export class JobProductRepository {
   async getJobListWithPopulate(
     page: number,
     limit: number,
-    query: {},
-    selectQuery: {},
+    query: Record<string, unknown>,
+    selectQuery: Record<string, unknown>,
     populateOptions: PopulateOptions[],
     sortQuery: string,
   ): Promise<JobProductDocument[] | null> {
@@ -34,8 +34,8 @@ export class JobProductRepository {
   async getJobListWithNoPopulate(
     page: number,
     limit: number,
-    query: {},
-    selectQuery: {},
+    query: Record<string, unknown>,
+    selectQuery: Record<string, unknown>,
   ): Promise<JobProductDocument[] | null> {
     return JobProductModel.find(query)
       .select(selectQuery)
@@ -45,8 +45,8 @@ export class JobProductRepository {
   }
 
   async getJobDetails(
-    query: {},
-    selectQuery: {},
+    query: Record<string, unknown>,
+    selectQuery: Record<string, unknown>,
     populateOptions: PopulateOptions[],
   ): Promise<JobProductDocument | null> {
     return JobProductModel.findOne(query)
@@ -55,16 +55,20 @@ export class JobProductRepository {
       .lean();
   }
 
-  async getJobAsMongooseDocument(query: {}): Promise<JobProductDocument | null> {
+  async getJobAsMongooseDocument(
+    query: Record<string, unknown>,
+  ): Promise<JobProductDocument | null> {
     return JobProductModel.findOne(query);
   }
 
-  async getNumberOfJobWithFilter(query: {}): Promise<number> {
+  async getNumberOfJobWithFilter(
+    query: Record<string, unknown>,
+  ): Promise<number> {
     return JobProductModel.countDocuments(query);
   }
 
   async changeJobDetails(
-    query: {},
+    query: Record<string, unknown>,
     updateOptions: UpdateQuery<JobProduct>,
   ) {
     return JobProductModel.findOneAndUpdate(query, updateOptions, {
@@ -72,7 +76,7 @@ export class JobProductRepository {
     });
   }
 
-  async changeJobStatus(query: {}, newStatus: number) {
+  async changeJobStatus(query: Record<string, unknown>, newStatus: number) {
     return JobProductModel.findOneAndUpdate(
       query,
       {

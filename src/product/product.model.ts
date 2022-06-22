@@ -20,7 +20,7 @@ import { Client } from '../clients/client.model';
   },
 })
 export class Product {
-  @prop({ required: true, type: Types.ObjectId, ref: () => Client})
+  @prop({ required: true, type: Types.ObjectId, ref: () => Client })
   user_id: Ref<Client>;
 
   @prop({ required: true })
@@ -55,7 +55,7 @@ export class Product {
 
   @prop({ default: Date.now() })
   create_time: Date;
-  
+
   @prop({ default: Date.now() })
   expiration_time: Date;
 

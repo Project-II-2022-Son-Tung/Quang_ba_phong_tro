@@ -1,5 +1,4 @@
 import { PopulateOptions, UpdateQuery } from 'mongoose';
-import { ProductStatus } from '../product/product-status.enum';
 import { CreateServiceDto } from './dtos/createService.dto';
 import {
   ServiceProduct,
@@ -18,8 +17,8 @@ export class ServiceProductRepository {
   async getServiceListWithPopulate(
     page: number,
     limit: number,
-    query: {},
-    selectQuery: {},
+    query: Record<string, unknown>,
+    selectQuery: Record<string, unknown>,
     populateOptions: PopulateOptions[],
     sortQuery: string,
   ): Promise<ServiceProductDocument[] | null> {
@@ -35,8 +34,8 @@ export class ServiceProductRepository {
   async getServiceListWithNoPopulate(
     page: number,
     limit: number,
-    query: {},
-    selectQuery: {},
+    query: Record<string, unknown>,
+    selectQuery: Record<string, unknown>,
   ): Promise<ServiceProductDocument[] | null> {
     return ServiceProductModel.find(query)
       .select(selectQuery)
@@ -46,8 +45,8 @@ export class ServiceProductRepository {
   }
 
   async getServiceDetails(
-    query: {},
-    selectQuery: {},
+    query: Record<string, unknown>,
+    selectQuery: Record<string, unknown>,
     populateOptions: PopulateOptions[],
   ): Promise<ServiceProductDocument | null> {
     return ServiceProductModel.findOne(query)
@@ -56,16 +55,20 @@ export class ServiceProductRepository {
       .lean();
   }
 
-  async getServiceAsMongooseDocument(query: {}): Promise<ServiceProductDocument | null> {
+  async getServiceAsMongooseDocument(
+    query: Record<string, unknown>,
+  ): Promise<ServiceProductDocument | null> {
     return ServiceProductModel.findOne(query);
   }
 
-  async getNumberOfServiceWithFilter(query: {}): Promise<number> {
+  async getNumberOfServiceWithFilter(
+    query: Record<string, unknown>,
+  ): Promise<number> {
     return ServiceProductModel.countDocuments(query);
   }
 
   async changeServiceDetails(
-    query: {},
+    query: Record<string, unknown>,
     updateOptions: UpdateQuery<ServiceProduct>,
   ) {
     return ServiceProductModel.findOneAndUpdate(query, updateOptions, {
@@ -73,7 +76,7 @@ export class ServiceProductRepository {
     });
   }
 
-  async changeServiceStatus(query: {}, newStatus: number) {
+  async changeServiceStatus(query: Record<string, unknown>, newStatus: number) {
     return ServiceProductModel.findOneAndUpdate(
       query,
       {

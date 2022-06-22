@@ -32,10 +32,7 @@ export class JobProductController {
     @CurrentUser({ required: true }) client: CurrentUserOnRedisDocument,
     @Body() createJobDto: CreateJobDto,
   ) {
-    await this.jobProductService.createJob(
-      client._id,
-      createJobDto,
-    );
+    await this.jobProductService.createJob(client._id, createJobDto);
     return {
       message: 'Created Sucessfully',
     };
@@ -118,10 +115,7 @@ export class JobProductController {
     @Param('job_id') job_id: string,
   ) {
     try {
-      return this.jobProductService.getCurrentUserJobDetail(
-        user._id,
-        job_id,
-      );
+      return this.jobProductService.getCurrentUserJobDetail(user._id, job_id);
     } catch (e) {
       throw new BadRequestError(e.message);
     }
@@ -136,10 +130,7 @@ export class JobProductController {
     @CurrentUser({ required: false }) user?: CurrentUserOnRedisDocument,
   ) {
     try {
-      return this.jobProductService.getOtherUserJobDetail(
-        user,
-        job_id,
-      );
+      return this.jobProductService.getOtherUserJobDetail(user, job_id);
     } catch (e) {
       throw new BadRequestError(e.message);
     }
@@ -176,10 +167,7 @@ export class JobProductController {
     @Param('job_id') job_id: string,
     @CurrentUser({ required: true }) client: CurrentUserOnRedisDocument,
   ) {
-    await this.jobProductService.changeJobDisplayStatus(
-      job_id,
-      client._id,
-    );
+    await this.jobProductService.changeJobDisplayStatus(job_id, client._id);
     return {
       message: 'Change Sucessfully',
     };
@@ -208,11 +196,7 @@ export class JobProductController {
     @Param('job_id') job_id: string,
     @CurrentUser({ required: true }) user: CurrentUserOnRedisDocument,
   ) {
-    await this.jobProductService.deleteJob(
-      user._id,
-      user.type,
-      job_id,
-    );
+    await this.jobProductService.deleteJob(user._id, user.type, job_id);
     return {
       message: 'Deleted Sucessfully',
     };
