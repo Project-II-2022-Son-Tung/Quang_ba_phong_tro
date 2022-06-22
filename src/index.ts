@@ -9,7 +9,7 @@ import { UserResolver } from "./resolvers/user";
 import session from 'express-session';
 import connectRedis from 'connect-redis';
 import { MyContext } from "./types/MyContext";
-import { ApolloServerPluginLandingPageGraphQLPlayground, ApolloServerPluginLandingPageProductionDefault } from "apollo-server-core";
+import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 import { createClient } from "redis";
 import { AdminResolver } from "./resolvers/admin";
 import { OwnerResolver } from "./resolvers/owner";
