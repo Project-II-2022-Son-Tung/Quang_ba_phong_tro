@@ -92,8 +92,7 @@ export class ChangeJobDetailDto {
   @ArrayUnique()
   @ArrayMaxSize(Object.keys(JobPaymentMethod).length)
   @IsEnum(JobPaymentMethod, { each: true })
-  payment_method:JobPaymentMethod[];
-  
+  payment_method: JobPaymentMethod[];
 
   @Expose()
   @IsNotEmpty()
@@ -101,7 +100,6 @@ export class ChangeJobDetailDto {
   @ArrayMaxSize(Object.keys(JobRequiredLevel).length)
   @IsEnum(JobRequiredLevel, { each: true })
   required_level: JobRequiredLevel[];
-
 
   @Expose()
   @IsNotEmpty()

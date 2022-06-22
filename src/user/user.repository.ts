@@ -107,11 +107,17 @@ export class UserRepository {
     }
   }
 
-  async changeClientProfile(query: Object, changeProfileDto: ChangeProfileDto) {
+  async changeClientProfile(
+    query: Record<string, unknown>,
+    changeProfileDto: ChangeProfileDto,
+  ) {
     await ClientModel.findOneAndUpdate(query, { ...changeProfileDto }).exec();
   }
 
-  async changeAdminProfile(query: Object, changeProfileDto: ChangeProfileDto) {
+  async changeAdminProfile(
+    query: Record<string, unknown>,
+    changeProfileDto: ChangeProfileDto,
+  ) {
     await AdminModel.findOneAndUpdate(query, { ...changeProfileDto }).exec();
   }
 

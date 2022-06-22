@@ -21,8 +21,8 @@ export class UserService {
     return this.userRepository.register(registerUserDto);
   }
 
-  async createAdminAccount(createUserDto:CreateUserDto){
-    return this.userRepository.createAdmin(createUserDto)
+  async createAdminAccount(createUserDto: CreateUserDto) {
+    return this.userRepository.createAdmin(createUserDto);
   }
 
   async getUserByEmailAndRole(

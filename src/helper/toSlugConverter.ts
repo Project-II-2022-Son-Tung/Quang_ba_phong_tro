@@ -1,4 +1,5 @@
 /* eslint-disable no-useless-escape */
+// Under investigation later
 export function toSlugConverter(title: string) {
   // Đổi chữ hoa thành chữ thường
   let slug = title.toString().toLowerCase();

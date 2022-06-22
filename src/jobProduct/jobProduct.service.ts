@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-inferrable-types */
-/* eslint-disable dot-notation */
 /* eslint-disable no-param-reassign */
 import { PopulateOptions } from 'mongoose';
 import { BadRequestError } from 'routing-controllers';
@@ -46,7 +44,11 @@ export class JobProductService {
     select: string,
   ) {
     const query = { status: ProductStatus.ACTIVE };
-    const selectQuery = {};
+    const selectQuery: {
+      category?: number;
+      user_id?: number;
+      [query: string]: number;
+    } = {};
     const populateQuery: PopulateOptions[] = [
       {
         path: 'user_id',
@@ -87,8 +89,8 @@ export class JobProductService {
       fieldsArray.forEach((value) => {
         selectQuery[value] = 1;
       });
-      if (!selectQuery['category']) populateQuery.pop();
-      if (!selectQuery['user_id']) populateQuery.shift();
+      if (!selectQuery.category) populateQuery.pop();
+      if (!selectQuery.user_id) populateQuery.shift();
     }
     const total = await this.jobProductRepository.getNumberOfJobWithFilter(
       query,
@@ -128,7 +130,7 @@ export class JobProductService {
       status: 1,
     };
     const populateQuery: PopulateOptions[] = [];
-    const sort_by: string = '';
+    const sort_by = '';
     const total = await this.jobProductRepository.getNumberOfJobWithFilter(
       query,
     );

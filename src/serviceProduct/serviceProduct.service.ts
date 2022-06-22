@@ -1,5 +1,4 @@
 /* eslint-disable no-param-reassign */
-/* eslint-disable dot-notation */
 import { PopulateOptions } from 'mongoose';
 import { BadRequestError } from 'routing-controllers';
 import { CurrentUserOnRedisDocument } from '../user/currentUserOnRedis.interface';
@@ -50,7 +49,10 @@ export class ServiceProductService {
     select: string,
   ) {
     const query = { status: ProductStatus.ACTIVE };
-    const selectQuery = {};
+    const selectQuery: {
+      category?: number;
+      user_id?: number;
+    } = {};
     const populateQuery: PopulateOptions[] = [
       {
         path: 'user_id',
@@ -87,8 +89,8 @@ export class ServiceProductService {
       fieldsArray.forEach((value) => {
         selectQuery[value] = 1;
       });
-      if (!selectQuery['category']) populateQuery.pop();
-      if (!selectQuery['user_id']) populateQuery.shift();
+      if (!selectQuery.category) populateQuery.pop();
+      if (!selectQuery.user_id) populateQuery.shift();
     }
     const total =
       await this.serviceProductRepository.getNumberOfServiceWithFilter(query);

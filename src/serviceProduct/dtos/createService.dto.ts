@@ -1,4 +1,4 @@
-import { Expose, Transform, Type } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import {
   ArrayMaxSize,
   ArrayUnique,
@@ -19,7 +19,6 @@ import { ObjectId } from 'mongoose';
 import { isLaterThanCurrentDate } from '../../customValidators/isLaterThanCurrentDate.validator';
 import { IsLargerOrEqual } from '../../customValidators/isLargerOrEqual.validator';
 import { ProductProvidingMethod } from '../../product/product-providing-method.enum';
-import { ProductType } from '../../product/product-type.enum';
 import { SkillObjectOnDocuments } from '../../user/skillObjectOnDocuments';
 import { isNotLaterThan } from '../../customValidators/isNotLaterThan.validator';
 

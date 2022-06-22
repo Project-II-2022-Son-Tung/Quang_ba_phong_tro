@@ -13,7 +13,6 @@ import {
 } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
 import { UserService } from './user.service';
-import { UserDocument } from './user.model';
 import { ChangePasswordDto } from './dtos/changePassword.dto';
 import { ChangeProfileDto } from './dtos/changeProfile.dto';
 import { fileUploadOptions } from '../config/multer';

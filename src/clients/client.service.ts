@@ -20,8 +20,11 @@ export class ClientService {
     select: string,
   ) {
     const query = { del_flag: false, status: UserStatus.ACTIVE };
-    const selectQuery = {};
-    let populateCategory = true;
+    const selectQuery: {
+      category?: number;
+      [query: string]: number;
+    } = {};
+    let populateCategory = false;
     if (currentUser && currentUser.type === 'admin') {
       delete query.status;
     }

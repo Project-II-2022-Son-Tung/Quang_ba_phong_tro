@@ -1,5 +1,16 @@
 import { Expose, Type } from 'class-transformer';
-import { IsString, IsDateString, IsOptional, MaxLength, MinLength, IsNumber, IsPositive, IsMongoId, IsArray, ValidateNested, ArrayMinSize, ArrayMaxSize, IsNotEmpty } from 'class-validator';
+import {
+  IsString,
+  IsDateString,
+  IsOptional,
+  MaxLength,
+  MinLength,
+  IsMongoId,
+  IsArray,
+  ValidateNested,
+  ArrayMaxSize,
+  IsNotEmpty,
+} from 'class-validator';
 import { Types } from 'mongoose';
 import { SocialMediaContact } from '../../social-media-contact/social-media-contact.model';
 import { SkillObjectOnDocuments } from '../skillObjectOnDocuments';
@@ -42,7 +53,7 @@ export class ChangeProfileDto {
   @IsOptional()
   @IsArray()
   @ArrayMaxSize(10)
-  @IsMongoId({each:true})
+  @IsMongoId({ each: true })
   category: Types.ObjectId[];
 
   @Expose()
@@ -58,5 +69,5 @@ export class ChangeProfileDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => SocialMediaContact)
-  social_media_contact:SocialMediaContact[];
+  social_media_contact: SocialMediaContact[];
 }

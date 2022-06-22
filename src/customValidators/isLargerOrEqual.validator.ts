@@ -1,8 +1,17 @@
-/* eslint-disable @typescript-eslint/ban-types */
-import { registerDecorator, ValidationOptions, ValidationArguments } from 'class-validator';
+import {
+  registerDecorator,
+  ValidationOptions,
+  ValidationArguments,
+} from 'class-validator';
 
-export function IsLargerOrEqual(property: string, validationOptions?: ValidationOptions) {
-  return function (object: Object, propertyName: string) {
+export function IsLargerOrEqual(
+  property: string,
+  validationOptions?: ValidationOptions,
+) {
+  return function IsLargerOrEqualDecoratorProvider(
+    object: unknown,
+    propertyName: string,
+  ) {
     registerDecorator({
       name: 'isLargerOrEqual',
       target: object.constructor,

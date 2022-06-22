@@ -1,10 +1,9 @@
-import {
-  AdminConfigDocument,
-  AdminConfigModel,
-} from './adminConfig.model';
+import { AdminConfigDocument, AdminConfigModel } from './adminConfig.model';
 
 export class AdminConfigRepository {
-  async getAdminConfig(query: {}): Promise<AdminConfigDocument | null> {
+  async getAdminConfig(
+    query: Record<string, unknown>,
+  ): Promise<AdminConfigDocument | null> {
     return AdminConfigModel.findOne(query).lean();
   }
 }
