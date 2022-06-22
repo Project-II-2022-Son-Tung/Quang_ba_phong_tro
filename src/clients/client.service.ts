@@ -1,3 +1,4 @@
+import { CategoryService } from '../category/category.service';
 import { CurrentUserOnRedisDocument } from '../user/currentUserOnRedis.interface';
 /* eslint-disable dot-notation */
 import { UserStatus } from '../user/user-status.enum';
@@ -8,27 +9,35 @@ import { ClientRepository } from './client.repository';
 export class ClientService {
   private readonly clientRepository = new ClientRepository();
 
+  private readonly categoryService = new CategoryService();
+
   async getClientList(
     currentUser: CurrentUserOnRedisDocument,
     page: number,
     limit: number,
-    category: string,
+    categorySlug: string,
+    address: string,
     select: string,
   ) {
     const query = { del_flag: false, status: UserStatus.ACTIVE };
     const selectQuery = {};
-    let populateCategory = false;
+    let populateCategory = true;
     if (currentUser && currentUser.type === 'admin') {
       delete query.status;
     }
-    if (category) Object.assign(query, { $in: { category } });
+    if (categorySlug) {
+      const categoriesIDArray =
+        await this.categoryService.getCategoriesIDBySlugString(categorySlug);
+      Object.assign(query, { category: { $in: categoriesIDArray } });
+    }
+    if (address) Object.assign(query, { address: { $in: address.split(',') } });
     if (select) {
       const fieldsArray = select.split(',');
       fieldsArray.forEach((value) => {
         if (!UserModelUnselectableFields.includes(value))
           selectQuery[value] = 1;
       });
-      if (selectQuery['category'] === 1) populateCategory = true;
+      populateCategory = selectQuery['category'] === 1;
     }
     const total = await this.clientRepository.getClientNumberWithFilter(query);
     let data: ClientDocument[];

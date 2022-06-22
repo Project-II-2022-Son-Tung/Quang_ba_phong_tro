@@ -10,11 +10,14 @@ import { JobProductRepository } from './jobProduct.repository';
 import { AdminConfigService } from '../admin-config/adminConfig.service';
 import { ChangeJobDetailDto } from './dtos/changeJobDetail.dto';
 import { CurrentUserOnRedisDocument } from '../user/currentUserOnRedis.interface';
+import { CategoryService } from '../category/category.service';
 
 export class JobProductService {
   private readonly jobProductRepository = new JobProductRepository();
 
   private readonly adminConfigService = new AdminConfigService();
+
+  private readonly categoryService = new CategoryService();
 
   async createJob(client_id: string, createJobDto: CreateJobDto) {
     if (createJobDto.skill && createJobDto.skill.some((skill) => !skill.slug)) {
@@ -34,9 +37,11 @@ export class JobProductService {
     limit: number,
     currentUser: CurrentUserOnRedisDocument,
     user_id: string,
-    category: string,
+    categorySlug: string,
     providing_method: string,
     fee_range: string,
+    name: string,
+    required_level: string,
     sort_by: string,
     select: string,
   ) {
@@ -50,8 +55,11 @@ export class JobProductService {
       { path: 'category', select: '-description' },
     ];
     if (user_id) Object.assign(query, { user_id: { $in: user_id.split(',') } });
-    if (category)
-      Object.assign(query, { category: { $in: category.split(',') } });
+    if (categorySlug) {
+      const categoriesIDArray =
+        await this.categoryService.getCategoriesIDBySlugString(categorySlug);
+      Object.assign(query, { category: { $in: categoriesIDArray } });
+    }
     if (providing_method)
       Object.assign(query, {
         providing_method: { $in: providing_method.split(',') },
@@ -68,6 +76,12 @@ export class JobProductService {
         upper_bound_fee: { $gte: minFee },
       });
     }
+    if (name)
+      Object.assign(query, { name: { $regex: `.*${name}.*`, $options: 'i' } });
+    if (required_level)
+      Object.assign(query, {
+        required_level: { $in: required_level.split(',') },
+      });
     if (select) {
       const fieldsArray = select.split(',');
       fieldsArray.forEach((value) => {

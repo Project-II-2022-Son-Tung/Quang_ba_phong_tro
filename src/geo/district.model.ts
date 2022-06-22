@@ -8,7 +8,7 @@ export class District {
   name: string;
 
   @prop()
-  city_code: string;
+  province_code: string;
 }
 
 export const DistrictModel = getModelForClass(District);

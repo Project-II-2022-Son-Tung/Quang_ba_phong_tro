@@ -3,72 +3,55 @@ import {
   Get,
   Param,
   BadRequestError,
-  Authorized,
 } from 'routing-controllers';
-import { OpenAPI } from 'routing-controllers-openapi';
 import { GeoService } from './geo.service';
 
 @JsonController('/geo')
 export class GeoController {
   private readonly geoService = new GeoService();
 
-  @OpenAPI({ security: [{ BearerAuth: [] }] })
-  @Authorized(['admin', 'client'])
   @Get('/countries', { transformResponse: false })
   async getAllCountries() {
     return this.geoService.getAllCountries();
   }
 
-  @OpenAPI({ security: [{ BearerAuth: [] }] })
-  @Authorized(['admin', 'client'])
   @Get('/countries/:code')
   async getCountryByCode(@Param('code') code: string) {
     try {
-      return this.geoService.getCityByCode(code);
+      return this.geoService.getProvinceByCode(code);
     } catch (e) {
       throw new BadRequestError(e.message);
     }
   }
 
-  @OpenAPI({ security: [{ BearerAuth: [] }] })
-  @Authorized(['admin', 'client'])
-  @Get('/cities', { transformResponse: false })
-  async getAllCities() {
-    return this.geoService.getAllCities();
+  @Get('/provinces', { transformResponse: false })
+  async getAllProvinces() {
+    return this.geoService.getAllProvinces();
   }
 
-  @OpenAPI({ security: [{ BearerAuth: [] }] })
-  @Authorized(['admin', 'client'])
-  @Get('/cities/:code')
-  async getCityByCode(@Param('code') code: string) {
+  @Get('/provinces/:code')
+  async getProvinceByCode(@Param('code') code: string) {
     try {
-      return this.geoService.getCityByCode(code);
+      return this.geoService.getProvinceByCode(code);
     } catch (e) {
       throw new BadRequestError(e.message);
     }
   }
 
-  @OpenAPI({ security: [{ BearerAuth: [] }] })
-  @Authorized(['admin', 'client'])
-  @Get('/cities/bycountry/:country_code')
-  @OpenAPI({ description: 'get City By Id' })
-  async getCityByCountryCode(@Param('country_code') country_code: string) {
+  @Get('/provinces/bycountry/:country_code')
+  async getProvinceByCountryCode(@Param('country_code') country_code: string) {
     try {
-      return this.geoService.getCityByCountryCode(country_code);
+      return this.geoService.getProvinceByCountryCode(country_code);
     } catch (e) {
       throw new BadRequestError(e.message);
     }
   }
 
-  @OpenAPI({ security: [{ BearerAuth: [] }] })
-  @Authorized(['admin', 'client'])
   @Get('/districts', { transformResponse: false })
   async getAllDistricts() {
     return this.geoService.getAllDistricts();
   }
 
-  @OpenAPI({ security: [{ BearerAuth: [] }] })
-  @Authorized(['admin', 'client'])
   @Get('/districts/:code')
   async getDistrictByCode(@Param('code') code: string) {
     try {
@@ -78,12 +61,35 @@ export class GeoController {
     }
   }
 
-  @OpenAPI({ security: [{ BearerAuth: [] }] })
-  @Authorized(['admin', 'client'])
-  @Get('/districts/bycity/:city_code')
-  async getDistrictByCityCode(@Param('city_code') city_code: string) {
+  @Get('/districts/byprovince/:province_code')
+  async getDistrictByProvinceCode(
+    @Param('province_code') province_code: string,
+  ) {
     try {
-      return this.geoService.getDistrictByCityCode(city_code);
+      return this.geoService.getDistrictByProvinceCode(province_code);
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  @Get('/wards', { transformResponse: false })
+  async getAllWards() {
+    return this.geoService.getAllWards();
+  }
+
+  @Get('/wards/:code', { transformResponse: false })
+  async getWardByCode(@Param('code') code: string) {
+    try {
+      return this.geoService.getWardByCode(code);
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  @Get('/wards/bydistrict/:district_code')
+  async getWardByDistrictCode(@Param('district_code') district_code: string) {
+    try {
+      return this.geoService.getWardByDistrictCode(district_code);
     } catch (e) {
       throw new BadRequestError(e.message);
     }

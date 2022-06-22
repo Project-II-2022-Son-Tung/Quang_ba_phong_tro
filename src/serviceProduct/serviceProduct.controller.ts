@@ -58,6 +58,8 @@ export class ServiceProductController {
     providing_method: string,
     @QueryParam('fee_range')
     fee_range: string,
+    @QueryParam('name')
+    name: string,
     @QueryParam('sort')
     sort_by: string,
     @QueryParam('select')
@@ -74,6 +76,7 @@ export class ServiceProductController {
         category,
         providing_method,
         fee_range,
+        name,
         sort_by,
         select,
       );

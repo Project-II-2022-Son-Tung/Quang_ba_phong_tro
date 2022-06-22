@@ -8,11 +8,14 @@ import { toSlugConverter } from '../helper/toSlugConverter';
 import { CreateServiceDto } from './dtos/createService.dto';
 import { ServiceProductRepository } from './serviceProduct.repository';
 import { AdminConfigService } from '../admin-config/adminConfig.service';
+import { CategoryService } from '../category/category.service';
 
 export class ServiceProductService {
   private readonly serviceProductRepository = new ServiceProductRepository();
 
   private readonly adminConfigService = new AdminConfigService();
+
+  private readonly categoryService = new CategoryService();
 
   async createService(client_id: string, createServiceDto: CreateServiceDto) {
     if (
@@ -39,9 +42,10 @@ export class ServiceProductService {
     limit: number,
     currentUser: CurrentUserOnRedisDocument,
     user_id: string,
-    category: string,
+    categorySlug: string,
     providing_method: string,
     fee_range: string,
+    name: string,
     sort_by: string,
     select: string,
   ) {
@@ -55,8 +59,13 @@ export class ServiceProductService {
       { path: 'category', select: '-description' },
     ];
     if (user_id) Object.assign(query, { user_id: { $in: user_id.split(',') } });
-    if (category)
-      Object.assign(query, { category: { $in: category.split(',') } });
+    if (categorySlug) {
+      const categoriesIDArray =
+        await this.categoryService.getCategoriesIDBySlugString(categorySlug);
+      Object.assign(query, { category: { $in: categoriesIDArray } });
+    }
+    if (name)
+      Object.assign(query, { name: { $regex: `.*${name}.*`, $options: 'i' } });
     if (providing_method)
       Object.assign(query, {
         providing_method: { $in: providing_method.split(',') },

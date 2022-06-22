@@ -37,6 +37,7 @@ import { OrderController } from './order/order.controller';
 import { WalletController } from './wallet/wallet.controller';
 import { TransactionController } from './transaction/transaction.controller';
 import agenda from './agenda';
+import { GeoController } from './geo/geo.controller';
 
 async function authorizationChecker(action: Action, roles: string[]) {
   const req: Request = action.request;
@@ -110,7 +111,7 @@ async function bootstrap() {
     controllers: [
       UserController,
       AuthController,
-      // GeoController,
+      GeoController,
       CategoryController,
       SkillController,
       ClientController,

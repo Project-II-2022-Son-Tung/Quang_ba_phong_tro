@@ -1,7 +1,6 @@
 import {
   JsonController,
   Get,
-  Authorized,
   QueryParam,
   BadRequestError,
   ForbiddenError,
@@ -28,6 +27,8 @@ export class ClientController {
     limit: number,
     @QueryParam('category')
     category: string,
+    @QueryParam('address')
+    address: string,
     @QueryParam('select')
     select: string,
   ) {
@@ -38,6 +39,7 @@ export class ClientController {
         page,
         limit,
         category,
+        address,
         select,
       );
     } catch (e) {
