@@ -11,7 +11,7 @@ export class UpdateUIInput   {
     @Field({nullable: true})
     issuedBy?: string
 
-    @Field()
+    @Field({nullable: true})
     avatarUrl?: string
 
     @Field({nullable: true})
@@ -20,7 +20,7 @@ export class UpdateUIInput   {
     @Field({nullable: true})
     phoneNumber?: string
     
-    @Field()
-    fullName: string
+    @Field({nullable: true})
+    fullName?: string
 
 }

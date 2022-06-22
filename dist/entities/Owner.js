@@ -66,8 +66,7 @@ __decorate([
     __metadata("design:type", String)
 ], Owner.prototype, "email", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(),
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ select: false }),
     __metadata("design:type", String)
 ], Owner.prototype, "password", void 0);
 __decorate([

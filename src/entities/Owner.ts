@@ -32,8 +32,7 @@ export class Owner extends BaseEntity {
     @Column({unique: true})
     email!: string;
 
-    @Field()
-    @Column()
+    @Column({select: false})
     password!: string;
 
     @Field()

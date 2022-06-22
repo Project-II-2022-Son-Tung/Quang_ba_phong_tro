@@ -11,6 +11,8 @@ import connectRedis from 'connect-redis';
 import { MyContext } from "./types/MyContext";
 import { ApolloServerPluginLandingPageGraphQLPlayground, ApolloServerPluginLandingPageProductionDefault } from "apollo-server-core";
 import { createClient } from "redis";
+import { AdminResolver } from "./resolvers/admin";
+import { OwnerResolver } from "./resolvers/owner";
 
 
 const main = async () => {
@@ -77,7 +79,7 @@ const main = async () => {
 	
 	const apolloServer = new ApolloServer({
 		schema: await buildSchema({
-		  resolvers: [UserResolver], 
+		  resolvers: [UserResolver, AdminResolver, OwnerResolver], 
 		  validate: false
 		}),
 		context: ({ req, res }): MyContext => ({ req, res, connection: AppDataSource.manager }),

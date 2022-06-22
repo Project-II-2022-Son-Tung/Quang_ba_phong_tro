@@ -14,6 +14,8 @@ const express_session_1 = __importDefault(require("express-session"));
 const connect_redis_1 = __importDefault(require("connect-redis"));
 const apollo_server_core_1 = require("apollo-server-core");
 const redis_1 = require("redis");
+const admin_1 = require("./resolvers/admin");
+const owner_1 = require("./resolvers/owner");
 const main = async () => {
     await data_source_1.AppDataSource.initialize();
     if (constants_1.__prod__) {
@@ -58,7 +60,7 @@ const main = async () => {
     }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: await (0, type_graphql_1.buildSchema)({
-            resolvers: [user_1.UserResolver],
+            resolvers: [user_1.UserResolver, admin_1.AdminResolver, owner_1.OwnerResolver],
             validate: false
         }),
         context: ({ req, res }) => ({ req, res, connection: data_source_1.AppDataSource.manager }),

@@ -1,7 +1,7 @@
-import { User } from "../entities/User";
+import { Owner } from "../entities/Owner";
 import { Arg,  Ctx,  Mutation, Query, Resolver } from "type-graphql";
 import argon2 from "argon2";
-import { UserMutationResponse } from "../types/UserMutationResponse";
+import { OwnerMutationResponse } from "../types/OwnerMutationResponse";
 import { validateRegisterInput } from "../utils/validateRegisterInput";
 import { LoginInput } from "../types/LoginInput";
 import { MyContext } from "../types/MyContext";
@@ -11,37 +11,37 @@ import { sendEmail } from "../utils/sendEmail";
 import { TokenModel } from "../models/Token";
 import { v4 as uuidv4} from "uuid"; 
 import { ChangePasswordInput } from "../types/ChangePasswordInput";
-import { UserRegisterInput } from "../types/UserRegisterInput";
+import { OwnerRegisterInput } from "../types/OwnerRegisterInput";
 import { Wallet } from "../entities/Wallet";
 import { Identification } from "../entities/Identification";
 import { UpdateUIInput } from "../types/UpdateUIInput";
 
-@Resolver(_of => User)
-export class UserResolver {
+@Resolver(_of => Owner)
+export class OwnerResolver {
 
-    @Query(_return => User, {nullable: true})
-    async me(
+    @Query(_return => Owner, {nullable: true})
+    async meOwner(
         @Ctx() ctx: MyContext
-    ): Promise<User| undefined | null> {
-        if((!ctx.req.session.userId) || ctx.req.session.role !== 'user') {
+    ): Promise<Owner| undefined | null> {
+        if((!ctx.req.session.userId) || ctx.req.session.role !== 'owner') {
             return null;
         }
-        const user = await User.findOne({
+        const owner = await Owner.findOne({
             where: {
                 id: ctx.req.session.userId
             },
             relations: ["identification", "wallet"],
         });
-        return user;
+        return owner;
 
     }
 
 
-    @Mutation(_return => UserMutationResponse)
-    async register(
-        @Arg("registerInput") registerInput: UserRegisterInput,
+    @Mutation(_return => OwnerMutationResponse)
+    async registerOwner(
+        @Arg("registerInput") registerInput: OwnerRegisterInput,
         @Ctx() myContext: MyContext
-    ) : Promise<UserMutationResponse> {
+    ) : Promise<OwnerMutationResponse> {
         const connection = myContext.connection;
         return await connection.transaction(async transactionEntityManager =>{
             const validateRegisterInputErrors = validateRegisterInput(registerInput);
@@ -54,16 +54,16 @@ export class UserResolver {
             }
             try{
                 const {username, email, password, fullName, address, identificationId, issueDate, issuedBy, avatarUrl, phoneNumber} = registerInput;
-                const existingUser = await transactionEntityManager.findOne(User, {where: [{email}, {username}]});
-                if (existingUser) {
+                const existingOwner = await transactionEntityManager.findOne(Owner, {where: [{email}, {username}]});
+                if (existingOwner) {
                     return {
                         code: 400,
                         success: false,
-                        message: "User already exists",
+                        message: "Owner already exists",
                         errors: [
                             {
-                                field: existingUser.username === username ? 'username' : 'email', 
-                                message: `${ existingUser.username === username ? 'Username' : 'Email'} already exists`
+                                field: existingOwner.username === username ? 'username' : 'email', 
+                                message: `${ existingOwner.username === username ? 'Ownername' : 'Email'} already exists`
                             }
                         ]
                     }
@@ -86,7 +86,7 @@ export class UserResolver {
                 });
                 await transactionEntityManager.save(uIdent);
 
-                const newUser = transactionEntityManager.create(User,{
+                const newOwner = transactionEntityManager.create(Owner,{
                     email,
                     username,
                     password: hashedPassword,
@@ -97,10 +97,10 @@ export class UserResolver {
                     wallet: uBalance,
                     identification: uIdent,
                 });
-                await transactionEntityManager.save(newUser);
-                myContext.req.session.userId = newUser.id;
-                myContext.req.session.name = newUser.fullName;
-                myContext.req.session.role = 'user';
+                await transactionEntityManager.save(newOwner);
+                myContext.req.session.userId = newOwner.id;
+                myContext.req.session.name = newOwner.fullName;
+                myContext.req.session.role = 'owner';
                 myContext.req.session.save(err => {
                     if(err) {
                         throw new Error(err);
@@ -110,8 +110,8 @@ export class UserResolver {
                 return {
                     code: 200,
                     success: true,
-                    message: "User registration successfully",
-                    user: newUser
+                    message: "Owner registration successfully",
+                    owner: newOwner
                 }
             } catch(err) {
                 console.log(err);
@@ -124,39 +124,39 @@ export class UserResolver {
         })
     }
 
-    @Mutation(_return => UserMutationResponse)
-    async login(
+    @Mutation(_return => OwnerMutationResponse)
+    async loginOwner(
         @Arg('loginInput') loginInput: LoginInput,
         @Ctx() myContext: MyContext
         )
-     : Promise<UserMutationResponse>{
+     : Promise<OwnerMutationResponse>{
         const {usernameOrEmail, password} = loginInput;
         try{
-            // const existingUser = await User.findOne({
+            // const existingOwner = await Owner.findOne({
             //     where: usernameOrEmail.includes("@") ? {email: usernameOrEmail} : {username: usernameOrEmail},
             // });
-            const existingUser = await myContext.connection.getRepository(User)
-                .createQueryBuilder("user")
-                .where(usernameOrEmail.includes("@") ? "user.email = :email" : "user.username = :username", {
+            const existingOwner = await myContext.connection.getRepository(Owner)
+                .createQueryBuilder("owner")
+                .where(usernameOrEmail.includes("@") ? "owner.email = :email" : "owner.username = :username", {
                     email: usernameOrEmail,
                     username: usernameOrEmail,
                 })
-                .addSelect("user.password")
+                .addSelect("owner.password")
                 .getOne();
-            if(!existingUser) {
+            if(!existingOwner) {
                 return {
                     code: 400,
                     success: false,
-                    message: "User not found",
+                    message: "Owner not found",
                     errors: [
                         {
                             field: 'usernameOrEmail', 
-                            message: 'Username or email incorrect'
+                            message: 'Ownername or email incorrect'
                         }
                     ]
                 }
             }
-            const validPassword = await argon2.verify(existingUser.password, password);
+            const validPassword = await argon2.verify(existingOwner.password, password);
             if(!validPassword) {
                 return {
                     code: 400,
@@ -172,9 +172,9 @@ export class UserResolver {
             }
 
             // Create session and return cookie
-            myContext.req.session.userId = existingUser.id;
-            myContext.req.session.name = existingUser.fullName;
-            myContext.req.session.role = 'user';
+            myContext.req.session.userId = existingOwner.id;
+            myContext.req.session.name = existingOwner.fullName;
+            myContext.req.session.role = 'owner';
             myContext.req.session.save(err => {
                 if(err) {
                     throw new Error(err);
@@ -185,8 +185,8 @@ export class UserResolver {
             return{
                 code: 200,
                 success: true,
-                message: "User login successfully",
-                user: existingUser
+                message: "Owner login successfully",
+                owner: existingOwner
             }
 
         } catch(err) {
@@ -216,40 +216,40 @@ export class UserResolver {
     }
 
     @Mutation(_return => Boolean)
-    async forgotPassword(
+    async forgotPasswordOwner(
         @Arg("forgotPasswordInput") forgotPasswordInput: ForgotPasswordInput
     ) : Promise<boolean> {
-        const user = await User.findOne({
+        const owner = await Owner.findOne({
             where: {email: forgotPasswordInput.email}
         });
-        if(!user) {
+        if(!owner) {
             return false;
         }
         
-        await TokenModel.findOneAndDelete({userId: user.id})
+        await TokenModel.findOneAndDelete({userId: owner.id})
         const resetToken = uuidv4();
         const hashedResetToken = await argon2.hash(resetToken);
 
 
 
         await new TokenModel({
-            userId: user.id,
+            userId: owner.id,
             token: hashedResetToken
         }).save();
 
 
 
-        await sendEmail(forgotPasswordInput.email, `<a href="http://localhost:3000/change-password?token=${resetToken}&userId=${user.id}">Click here to reset your password</a>`);
+        await sendEmail(forgotPasswordInput.email, `<a href="http://localhost:3000/change-password?token=${resetToken}&userId=${owner.id}">Click here to reset your password</a>`);
         return true;
     }
 
-    @Mutation(_return => UserMutationResponse)
-    async changePassword(
+    @Mutation(_return => OwnerMutationResponse)
+    async changePasswordOwner(
         @Ctx() ctx: MyContext,
         @Arg('token') token: string,
         @Arg('userId') userId: string,
         @Arg('changePasswordInput') changePasswordInput: ChangePasswordInput
-    ): Promise<UserMutationResponse>{
+    ): Promise<OwnerMutationResponse>{
         if(changePasswordInput.newPassword.length <= 5){
             return { 
                 code:400,
@@ -289,31 +289,31 @@ export class UserResolver {
                         ]
                     }
                 }
-                const user = await User.findOne({
+                const owner = await Owner.findOne({
                     where: {id: userId}
                 });
-                if(!user) {
+                if(!owner) {
                     return {
                         code: 400,
                         success: false,
-                        message: "User not found",
+                        message: "Owner not found",
                         errors: [
                             {
                                 field: 'token',
-                                message: 'User not found'
+                                message: 'Owner not found'
                             }
                         ]
                     }
                 }
                 const updatedPassword = await argon2.hash(changePasswordInput.newPassword);
-                await User.update({id: userId}, {password: updatedPassword});
+                await Owner.update({id: userId}, {password: updatedPassword});
                 await resePasswordToken.deleteOne();
-                ctx.req.session.userId = user.id;
+                ctx.req.session.userId = owner.id;
                 return {
                     code: 200,
                     success: true,
                     message: "Password successfully changed",
-                    user
+                    owner
                 }
 
             } catch (error) {
@@ -326,12 +326,12 @@ export class UserResolver {
             }
     }
 
-    @Mutation(_return => UserMutationResponse, {nullable: true})
-    async updateUser(
-        @Arg('updateUserInput') updateUserInput: UpdateUIInput,
+    @Mutation(_return => OwnerMutationResponse, {nullable: true})
+    async updateOwner(
+        @Arg('updateOwnerInput') updateOwnerInput: UpdateUIInput,
         @Ctx() ctx: MyContext
-    ) : Promise<UserMutationResponse> {
-        if((!ctx.req.session.userId) || ctx.req.session.role !== 'user') {
+    ) : Promise<OwnerMutationResponse> {
+        if((!ctx.req.session.userId) || ctx.req.session.role !== 'owner') {
             return {
                 code: 401,
                 success: false,
@@ -344,67 +344,66 @@ export class UserResolver {
                 ]
             };
         }
-        const user = await User.findOne({
+        const owner = await Owner.findOne({
             where: {id: ctx.req.session.userId},
             relations: ["identification", "wallet"],
         });
-        if(!user) {
+        if(!owner) {
             return {
                 code: 400,
                 success: false,
-                message: "User not found",
+                message: "Owner not found",
                 errors: [
                     {
                         field: 'token',
-                        message: 'User not found'
+                        message: 'Owner not found'
                     }
                 ]
             };
         }
-        if(Object.keys(updateUserInput).length < 1) {
+        if(Object.keys(updateOwnerInput).length < 1) {
             return {
                 code: 400,
                 success: false,
                 message: "No data to update",
                 errors: [
                     {
-                        field: 'updateUserInput',
+                        field: 'updateOwnerInput',
                         message: 'No data to update'
                     }
                 ]
             };
         }
-        if(updateUserInput.identificationId && updateUserInput.identificationId !== user.identificationId
-            && updateUserInput.issueDate && updateUserInput.issuedBy) {
-            await Identification.update({id: user.identificationId}, {
-                serial: updateUserInput.identificationId,
-                issueDate: updateUserInput.issueDate,
-                issuedBy: updateUserInput.issuedBy
+        if(updateOwnerInput.identificationId && updateOwnerInput.identificationId !== owner.identificationId
+            && updateOwnerInput.issueDate && updateOwnerInput.issuedBy) {
+            await Identification.update({id: owner.identificationId}, {
+                serial: updateOwnerInput.identificationId,
+                issueDate: updateOwnerInput.issueDate,
+                issuedBy: updateOwnerInput.issuedBy
             });
         }
-        // const updatedUser = await User.createQueryBuilder().update({
-        //     fullName: updateUserInput.fullName ? updateUserInput.fullName : user.fullName,
-        //     avatarUrl: updateUserInput.avatarUrl ? updateUserInput.avatarUrl : user.avatarUrl,
-        //     phoneNumber: updateUserInput.phoneNumber ? updateUserInput.phoneNumber : user.phoneNumber,
-        //     address: updateUserInput.address ? updateUserInput.address : user.address,
+        // const updatedOwner = await Owner.createQueryBuilder().update({
+        //     fullName: updateOwnerInput.fullName ? updateOwnerInput.fullName : owner.fullName,
+        //     avatarUrl: updateOwnerInput.avatarUrl ? updateOwnerInput.avatarUrl : owner.avatarUrl,
+        //     phoneNumber: updateOwnerInput.phoneNumber ? updateOwnerInput.phoneNumber : owner.phoneNumber,
+        //     address: updateOwnerInput.address ? updateOwnerInput.address : owner.address,
         // })
         // .where({id: ctx.req.session.userId})
         // .returning('*')
         // .execute();
-        updateUserInput.fullName ? user.fullName = updateUserInput.fullName : null;
-        updateUserInput.avatarUrl ? user.avatarUrl = updateUserInput.avatarUrl : null;
-        updateUserInput.phoneNumber ? user.phoneNumber = updateUserInput.phoneNumber : null;
-        updateUserInput.address ? user.address = updateUserInput.address : null;
-        await user.save();
+        updateOwnerInput.fullName ? owner.fullName = updateOwnerInput.fullName : null;
+        updateOwnerInput.avatarUrl ? owner.avatarUrl = updateOwnerInput.avatarUrl : null;
+        updateOwnerInput.phoneNumber ? owner.phoneNumber = updateOwnerInput.phoneNumber : null;
+        updateOwnerInput.address ? owner.address = updateOwnerInput.address : null;
+        await owner.save();
 
-
+        
 
         return {
             code: 200,
             success: true,
-            message: "User updated successfully",
-            user
+            message: "Owner updated successfully",
+            owner
         }
     }
-
 }

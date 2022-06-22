@@ -8,6 +8,7 @@ const path_1 = __importDefault(require("path"));
 require("reflect-metadata");
 const typeorm_1 = require("typeorm");
 const constants_1 = require("./constants");
+const Admin_1 = require("./entities/Admin");
 const Contract_1 = require("./entities/Contract");
 const Identification_1 = require("./entities/Identification");
 const Invite_1 = require("./entities/Invite");
@@ -42,7 +43,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
         ssl: true
     } : {}),
     ...(constants_1.__prod__ ? {} : { synchronize: true }),
-    entities: [User_1.User, Owner_1.Owner, UserHistory_1.UserHistory, RoomRate_1.RoomRate, RoomImage_1.RoomImage, Room_1.Room, RateImage_1.RateImage, OwnerRate_1.OwnerRate, OwnerHistory_1.OwnerHistory, Invite_1.Invite, Identification_1.Identification, Contract_1.Contract, Wallet_1.Wallet],
+    entities: [Admin_1.Admin, User_1.User, Owner_1.Owner, UserHistory_1.UserHistory, RoomRate_1.RoomRate, RoomImage_1.RoomImage, Room_1.Room, RateImage_1.RateImage, OwnerRate_1.OwnerRate, OwnerHistory_1.OwnerHistory, Invite_1.Invite, Identification_1.Identification, Contract_1.Contract, Wallet_1.Wallet],
     migrations: [path_1.default.join(__dirname, '/migrations/*')]
 });
 //# sourceMappingURL=data-source.js.map

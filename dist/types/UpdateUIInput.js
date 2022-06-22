@@ -33,7 +33,7 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateUIInput.prototype, "issuedBy", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(),
+    (0, type_graphql_1.Field)({ nullable: true }),
     __metadata("design:type", String)
 ], UpdateUIInput.prototype, "avatarUrl", void 0);
 __decorate([
@@ -45,7 +45,7 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateUIInput.prototype, "phoneNumber", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(),
+    (0, type_graphql_1.Field)({ nullable: true }),
     __metadata("design:type", String)
 ], UpdateUIInput.prototype, "fullName", void 0);
 UpdateUIInput = __decorate([

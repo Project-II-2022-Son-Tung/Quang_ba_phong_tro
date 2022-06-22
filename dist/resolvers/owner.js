@@ -15,11 +15,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserResolver = void 0;
-const User_1 = require("../entities/User");
+exports.OwnerResolver = void 0;
+const Owner_1 = require("../entities/Owner");
 const type_graphql_1 = require("type-graphql");
 const argon2_1 = __importDefault(require("argon2"));
-const UserMutationResponse_1 = require("../types/UserMutationResponse");
+const OwnerMutationResponse_1 = require("../types/OwnerMutationResponse");
 const validateRegisterInput_1 = require("../utils/validateRegisterInput");
 const LoginInput_1 = require("../types/LoginInput");
 const constants_1 = require("../constants");
@@ -28,24 +28,24 @@ const sendEmail_1 = require("../utils/sendEmail");
 const Token_1 = require("../models/Token");
 const uuid_1 = require("uuid");
 const ChangePasswordInput_1 = require("../types/ChangePasswordInput");
-const UserRegisterInput_1 = require("../types/UserRegisterInput");
+const OwnerRegisterInput_1 = require("../types/OwnerRegisterInput");
 const Wallet_1 = require("../entities/Wallet");
 const Identification_1 = require("../entities/Identification");
 const UpdateUIInput_1 = require("../types/UpdateUIInput");
-let UserResolver = class UserResolver {
-    async me(ctx) {
-        if ((!ctx.req.session.userId) || ctx.req.session.role !== 'user') {
+let OwnerResolver = class OwnerResolver {
+    async meOwner(ctx) {
+        if ((!ctx.req.session.userId) || ctx.req.session.role !== 'owner') {
             return null;
         }
-        const user = await User_1.User.findOne({
+        const owner = await Owner_1.Owner.findOne({
             where: {
                 id: ctx.req.session.userId
             },
             relations: ["identification", "wallet"],
         });
-        return user;
+        return owner;
     }
-    async register(registerInput, myContext) {
+    async registerOwner(registerInput, myContext) {
         const connection = myContext.connection;
         return await connection.transaction(async (transactionEntityManager) => {
             const validateRegisterInputErrors = (0, validateRegisterInput_1.validateRegisterInput)(registerInput);
@@ -58,16 +58,16 @@ let UserResolver = class UserResolver {
             }
             try {
                 const { username, email, password, fullName, address, identificationId, issueDate, issuedBy, avatarUrl, phoneNumber } = registerInput;
-                const existingUser = await transactionEntityManager.findOne(User_1.User, { where: [{ email }, { username }] });
-                if (existingUser) {
+                const existingOwner = await transactionEntityManager.findOne(Owner_1.Owner, { where: [{ email }, { username }] });
+                if (existingOwner) {
                     return {
                         code: 400,
                         success: false,
-                        message: "User already exists",
+                        message: "Owner already exists",
                         errors: [
                             {
-                                field: existingUser.username === username ? 'username' : 'email',
-                                message: `${existingUser.username === username ? 'Username' : 'Email'} already exists`
+                                field: existingOwner.username === username ? 'username' : 'email',
+                                message: `${existingOwner.username === username ? 'Ownername' : 'Email'} already exists`
                             }
                         ]
                     };
@@ -87,7 +87,7 @@ let UserResolver = class UserResolver {
                     issuedBy,
                 });
                 await transactionEntityManager.save(uIdent);
-                const newUser = transactionEntityManager.create(User_1.User, {
+                const newOwner = transactionEntityManager.create(Owner_1.Owner, {
                     email,
                     username,
                     password: hashedPassword,
@@ -98,10 +98,10 @@ let UserResolver = class UserResolver {
                     wallet: uBalance,
                     identification: uIdent,
                 });
-                await transactionEntityManager.save(newUser);
-                myContext.req.session.userId = newUser.id;
-                myContext.req.session.name = newUser.fullName;
-                myContext.req.session.role = 'user';
+                await transactionEntityManager.save(newOwner);
+                myContext.req.session.userId = newOwner.id;
+                myContext.req.session.name = newOwner.fullName;
+                myContext.req.session.role = 'owner';
                 myContext.req.session.save(err => {
                     if (err) {
                         throw new Error(err);
@@ -110,8 +110,8 @@ let UserResolver = class UserResolver {
                 return {
                     code: 200,
                     success: true,
-                    message: "User registration successfully",
-                    user: newUser
+                    message: "Owner registration successfully",
+                    owner: newOwner
                 };
             }
             catch (err) {
@@ -124,31 +124,31 @@ let UserResolver = class UserResolver {
             }
         });
     }
-    async login(loginInput, myContext) {
+    async loginOwner(loginInput, myContext) {
         const { usernameOrEmail, password } = loginInput;
         try {
-            const existingUser = await myContext.connection.getRepository(User_1.User)
-                .createQueryBuilder("user")
-                .where(usernameOrEmail.includes("@") ? "user.email = :email" : "user.username = :username", {
+            const existingOwner = await myContext.connection.getRepository(Owner_1.Owner)
+                .createQueryBuilder("owner")
+                .where(usernameOrEmail.includes("@") ? "owner.email = :email" : "owner.username = :username", {
                 email: usernameOrEmail,
                 username: usernameOrEmail,
             })
-                .addSelect("user.password")
+                .addSelect("owner.password")
                 .getOne();
-            if (!existingUser) {
+            if (!existingOwner) {
                 return {
                     code: 400,
                     success: false,
-                    message: "User not found",
+                    message: "Owner not found",
                     errors: [
                         {
                             field: 'usernameOrEmail',
-                            message: 'Username or email incorrect'
+                            message: 'Ownername or email incorrect'
                         }
                     ]
                 };
             }
-            const validPassword = await argon2_1.default.verify(existingUser.password, password);
+            const validPassword = await argon2_1.default.verify(existingOwner.password, password);
             if (!validPassword) {
                 return {
                     code: 400,
@@ -162,9 +162,9 @@ let UserResolver = class UserResolver {
                     ]
                 };
             }
-            myContext.req.session.userId = existingUser.id;
-            myContext.req.session.name = existingUser.fullName;
-            myContext.req.session.role = 'user';
+            myContext.req.session.userId = existingOwner.id;
+            myContext.req.session.name = existingOwner.fullName;
+            myContext.req.session.role = 'owner';
             myContext.req.session.save(err => {
                 if (err) {
                     throw new Error(err);
@@ -173,8 +173,8 @@ let UserResolver = class UserResolver {
             return {
                 code: 200,
                 success: true,
-                message: "User login successfully",
-                user: existingUser
+                message: "Owner login successfully",
+                owner: existingOwner
             };
         }
         catch (err) {
@@ -198,24 +198,24 @@ let UserResolver = class UserResolver {
             });
         });
     }
-    async forgotPassword(forgotPasswordInput) {
-        const user = await User_1.User.findOne({
+    async forgotPasswordOwner(forgotPasswordInput) {
+        const owner = await Owner_1.Owner.findOne({
             where: { email: forgotPasswordInput.email }
         });
-        if (!user) {
+        if (!owner) {
             return false;
         }
-        await Token_1.TokenModel.findOneAndDelete({ userId: user.id });
+        await Token_1.TokenModel.findOneAndDelete({ userId: owner.id });
         const resetToken = (0, uuid_1.v4)();
         const hashedResetToken = await argon2_1.default.hash(resetToken);
         await new Token_1.TokenModel({
-            userId: user.id,
+            userId: owner.id,
             token: hashedResetToken
         }).save();
-        await (0, sendEmail_1.sendEmail)(forgotPasswordInput.email, `<a href="http://localhost:3000/change-password?token=${resetToken}&userId=${user.id}">Click here to reset your password</a>`);
+        await (0, sendEmail_1.sendEmail)(forgotPasswordInput.email, `<a href="http://localhost:3000/change-password?token=${resetToken}&userId=${owner.id}">Click here to reset your password</a>`);
         return true;
     }
-    async changePassword(ctx, token, userId, changePasswordInput) {
+    async changePasswordOwner(ctx, token, userId, changePasswordInput) {
         if (changePasswordInput.newPassword.length <= 5) {
             return {
                 code: 400,
@@ -255,31 +255,31 @@ let UserResolver = class UserResolver {
                     ]
                 };
             }
-            const user = await User_1.User.findOne({
+            const owner = await Owner_1.Owner.findOne({
                 where: { id: userId }
             });
-            if (!user) {
+            if (!owner) {
                 return {
                     code: 400,
                     success: false,
-                    message: "User not found",
+                    message: "Owner not found",
                     errors: [
                         {
                             field: 'token',
-                            message: 'User not found'
+                            message: 'Owner not found'
                         }
                     ]
                 };
             }
             const updatedPassword = await argon2_1.default.hash(changePasswordInput.newPassword);
-            await User_1.User.update({ id: userId }, { password: updatedPassword });
+            await Owner_1.Owner.update({ id: userId }, { password: updatedPassword });
             await resePasswordToken.deleteOne();
-            ctx.req.session.userId = user.id;
+            ctx.req.session.userId = owner.id;
             return {
                 code: 200,
                 success: true,
                 message: "Password successfully changed",
-                user
+                owner
             };
         }
         catch (error) {
@@ -291,8 +291,8 @@ let UserResolver = class UserResolver {
             };
         }
     }
-    async updateUser(updateUserInput, ctx) {
-        if ((!ctx.req.session.userId) || ctx.req.session.role !== 'user') {
+    async updateOwner(updateOwnerInput, ctx) {
+        if ((!ctx.req.session.userId) || ctx.req.session.role !== 'owner') {
             return {
                 code: 401,
                 success: false,
@@ -305,96 +305,96 @@ let UserResolver = class UserResolver {
                 ]
             };
         }
-        const user = await User_1.User.findOne({
+        const owner = await Owner_1.Owner.findOne({
             where: { id: ctx.req.session.userId },
             relations: ["identification", "wallet"],
         });
-        if (!user) {
+        if (!owner) {
             return {
                 code: 400,
                 success: false,
-                message: "User not found",
+                message: "Owner not found",
                 errors: [
                     {
                         field: 'token',
-                        message: 'User not found'
+                        message: 'Owner not found'
                     }
                 ]
             };
         }
-        if (Object.keys(updateUserInput).length < 1) {
+        if (Object.keys(updateOwnerInput).length < 1) {
             return {
                 code: 400,
                 success: false,
                 message: "No data to update",
                 errors: [
                     {
-                        field: 'updateUserInput',
+                        field: 'updateOwnerInput',
                         message: 'No data to update'
                     }
                 ]
             };
         }
-        if (updateUserInput.identificationId && updateUserInput.identificationId !== user.identificationId
-            && updateUserInput.issueDate && updateUserInput.issuedBy) {
-            await Identification_1.Identification.update({ id: user.identificationId }, {
-                serial: updateUserInput.identificationId,
-                issueDate: updateUserInput.issueDate,
-                issuedBy: updateUserInput.issuedBy
+        if (updateOwnerInput.identificationId && updateOwnerInput.identificationId !== owner.identificationId
+            && updateOwnerInput.issueDate && updateOwnerInput.issuedBy) {
+            await Identification_1.Identification.update({ id: owner.identificationId }, {
+                serial: updateOwnerInput.identificationId,
+                issueDate: updateOwnerInput.issueDate,
+                issuedBy: updateOwnerInput.issuedBy
             });
         }
-        updateUserInput.fullName ? user.fullName = updateUserInput.fullName : null;
-        updateUserInput.avatarUrl ? user.avatarUrl = updateUserInput.avatarUrl : null;
-        updateUserInput.phoneNumber ? user.phoneNumber = updateUserInput.phoneNumber : null;
-        updateUserInput.address ? user.address = updateUserInput.address : null;
-        await user.save();
+        updateOwnerInput.fullName ? owner.fullName = updateOwnerInput.fullName : null;
+        updateOwnerInput.avatarUrl ? owner.avatarUrl = updateOwnerInput.avatarUrl : null;
+        updateOwnerInput.phoneNumber ? owner.phoneNumber = updateOwnerInput.phoneNumber : null;
+        updateOwnerInput.address ? owner.address = updateOwnerInput.address : null;
+        await owner.save();
         return {
             code: 200,
             success: true,
-            message: "User updated successfully",
-            user
+            message: "Owner updated successfully",
+            owner
         };
     }
 };
 __decorate([
-    (0, type_graphql_1.Query)(_return => User_1.User, { nullable: true }),
+    (0, type_graphql_1.Query)(_return => Owner_1.Owner, { nullable: true }),
     __param(0, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
-], UserResolver.prototype, "me", null);
+], OwnerResolver.prototype, "meOwner", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(_return => UserMutationResponse_1.UserMutationResponse),
+    (0, type_graphql_1.Mutation)(_return => OwnerMutationResponse_1.OwnerMutationResponse),
     __param(0, (0, type_graphql_1.Arg)("registerInput")),
     __param(1, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [UserRegisterInput_1.UserRegisterInput, Object]),
+    __metadata("design:paramtypes", [OwnerRegisterInput_1.OwnerRegisterInput, Object]),
     __metadata("design:returntype", Promise)
-], UserResolver.prototype, "register", null);
+], OwnerResolver.prototype, "registerOwner", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(_return => UserMutationResponse_1.UserMutationResponse),
+    (0, type_graphql_1.Mutation)(_return => OwnerMutationResponse_1.OwnerMutationResponse),
     __param(0, (0, type_graphql_1.Arg)('loginInput')),
     __param(1, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [LoginInput_1.LoginInput, Object]),
     __metadata("design:returntype", Promise)
-], UserResolver.prototype, "login", null);
+], OwnerResolver.prototype, "loginOwner", null);
 __decorate([
     (0, type_graphql_1.Mutation)(_return => Boolean),
     __param(0, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
-], UserResolver.prototype, "logout", null);
+], OwnerResolver.prototype, "logout", null);
 __decorate([
     (0, type_graphql_1.Mutation)(_return => Boolean),
     __param(0, (0, type_graphql_1.Arg)("forgotPasswordInput")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [ForgotPassword_1.ForgotPasswordInput]),
     __metadata("design:returntype", Promise)
-], UserResolver.prototype, "forgotPassword", null);
+], OwnerResolver.prototype, "forgotPasswordOwner", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(_return => UserMutationResponse_1.UserMutationResponse),
+    (0, type_graphql_1.Mutation)(_return => OwnerMutationResponse_1.OwnerMutationResponse),
     __param(0, (0, type_graphql_1.Ctx)()),
     __param(1, (0, type_graphql_1.Arg)('token')),
     __param(2, (0, type_graphql_1.Arg)('userId')),
@@ -402,17 +402,17 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, String, String, ChangePasswordInput_1.ChangePasswordInput]),
     __metadata("design:returntype", Promise)
-], UserResolver.prototype, "changePassword", null);
+], OwnerResolver.prototype, "changePasswordOwner", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(_return => UserMutationResponse_1.UserMutationResponse, { nullable: true }),
-    __param(0, (0, type_graphql_1.Arg)('updateUserInput')),
+    (0, type_graphql_1.Mutation)(_return => OwnerMutationResponse_1.OwnerMutationResponse, { nullable: true }),
+    __param(0, (0, type_graphql_1.Arg)('updateOwnerInput')),
     __param(1, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [UpdateUIInput_1.UpdateUIInput, Object]),
     __metadata("design:returntype", Promise)
-], UserResolver.prototype, "updateUser", null);
-UserResolver = __decorate([
-    (0, type_graphql_1.Resolver)(_of => User_1.User)
-], UserResolver);
-exports.UserResolver = UserResolver;
-//# sourceMappingURL=user.js.map
+], OwnerResolver.prototype, "updateOwner", null);
+OwnerResolver = __decorate([
+    (0, type_graphql_1.Resolver)(_of => Owner_1.Owner)
+], OwnerResolver);
+exports.OwnerResolver = OwnerResolver;
+//# sourceMappingURL=owner.js.map

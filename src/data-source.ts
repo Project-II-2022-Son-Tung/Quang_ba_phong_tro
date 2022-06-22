@@ -3,6 +3,7 @@ import path from "path";
 import "reflect-metadata"
 import { DataSource } from "typeorm"
 import { __prod__ } from "./constants";
+import { Admin } from "./entities/Admin";
 import { Contract } from "./entities/Contract";
 import { Identification } from "./entities/Identification";
 import { Invite } from "./entities/Invite";
@@ -38,7 +39,7 @@ export const AppDataSource = new DataSource({
           ssl: true
         } : {}),
         ...(__prod__ ? {} : {synchronize: true} ),
-        entities: [User, Owner, UserHistory, RoomRate, RoomImage, Room, RateImage, OwnerRate, OwnerHistory, Invite, Identification, Contract, Wallet],    
+        entities: [Admin, User, Owner, UserHistory, RoomRate, RoomImage, Room, RateImage, OwnerRate, OwnerHistory, Invite, Identification, Contract, Wallet],    
         migrations: [path.join(__dirname, '/migrations/*')]
 });
 
