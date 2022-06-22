@@ -397,12 +397,10 @@ export class UserResolver {
         updateUserInput.address ? user.address = updateUserInput.address : null;
         await user.save();
 
-
-
         return {
             code: 200,
             success: true,
-            message: "User updated successfully",
+            message: "User updated successfully !",
             user
         }
     }
