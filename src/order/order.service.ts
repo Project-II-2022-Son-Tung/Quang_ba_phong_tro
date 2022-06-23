@@ -4,6 +4,8 @@
 import { startSession } from 'mongoose';
 import FormData from 'form-data';
 import axios from 'axios';
+import { BadRequestError } from 'routing-controllers';
+import { createReadStream, unlink } from 'fs';
 import { OrderRepository } from './order.repository';
 import { OrderDocument, OrderModel } from './order.model';
 import { OfferRepository } from '../Offer/offer.repository';
@@ -15,6 +17,8 @@ import { WalletModel } from '../wallet/wallet.model';
 import { TransactionDirection } from '../transaction/transaction-direction';
 import { InternalTransModel } from '../transaction/internalTrans.model';
 import agenda from '../agenda';
+import { ServiceProductModel } from '../serviceProduct/serviceProduct.model';
+import { RequestServiceDto } from './dtos/requestService.dto';
 
 export class OrderService {
   private readonly orderRepository = new OrderRepository();
@@ -28,13 +32,10 @@ export class OrderService {
   ): Promise<OrderDocument> {
     const offer = await this.offerRepository.getOfferById(offer_id);
     const job = await ProductModel.findById(offer.job_id);
-    if (!job || job.status === 2) throw new Error('Job not found');
+    if (!job || job.status === 2 || job.status === 3)
+      throw new Error('Job not found');
     if (!offer || offer.status !== 0 || user_id !== job.user_id.toString())
       throw new Error('Offer not found or you do not have permision to accept');
-    const order = await this.orderRepository.getOrderByJobId(
-      job._id.toString(),
-    );
-    if (order) throw new Error('Order already exists');
     const session = await startSession();
     session.startTransaction();
     try {
@@ -56,6 +57,55 @@ export class OrderService {
       await OfferModel.updateMany(
         { job_id: job._id.toString(), status: 0 },
         { status: 2 },
+        { session },
+      );
+      await session.commitTransaction();
+      session.endSession();
+      const returnObject = (await OrderModel.findById(
+        newOrder[0]._id.toString(),
+      ).lean()) as OrderDocument;
+      return returnObject;
+    } catch (err) {
+      await session.abortTransaction();
+      await session.endSession();
+      throw err;
+    }
+  }
+
+  async requestService(
+    user_id: string,
+    service_id: string,
+    requestServiceDto: RequestServiceDto
+  ): Promise<OrderDocument> {
+    const service = await ServiceProductModel.findById(service_id).lean();
+    if (!service || service.status === 2 || service.status === 3)
+      throw new Error('Service not found');
+    if (service.user_id.toString() === user_id)
+      throw new Error('You cannot request your own service');
+    let price: number;
+    if (service.lower_bound_fee === service.upper_bound_fee)
+      price = service.lower_bound_fee;
+    else price = requestServiceDto.price || service.lower_bound_fee;
+    const session = await startSession();
+    session.startTransaction();
+    try {
+      const newOrder = await OrderModel.create(
+        [
+          {
+            product_id: service_id,
+            client_id: user_id,
+            provider_id: service.user_id.toString(),
+            type: OrderType.Service,
+            price,
+            note: requestServiceDto.note,
+            estimated_time: service.finish_estimated_time,
+          },
+        ],
+        { session },
+      );
+      await ServiceProductModel.findByIdAndUpdate(
+        service_id,
+        { status: 1 },
         { session },
       );
       await session.commitTransaction();
@@ -387,7 +437,7 @@ export class OrderService {
     user_id: string,
     order_id: string,
     complain: string,
-    images: Express.Multer.File[],
+    images: Array<Express.Multer.File>,
   ): Promise<OrderDocument> {
     const currentOrder = await this.orderRepository.getOrderById(order_id);
     if (!currentOrder) throw new Error('Order not found');
@@ -400,30 +450,41 @@ export class OrderService {
         const session = await startSession();
         session.startTransaction();
         try {
-          const form = new FormData();
-          const imagesrcs = [];
-          images.forEach(async (image) => {
-            form.append('images', image.buffer);
-          });
-          const mediaResponse = await axios.post<string>(
-            `${process.env.MEDIA_ROOT_URL}/file`,
-            form,
-            {
-              headers: { ...form.getHeaders() },
-            },
-          );
-          imagesrcs.push(mediaResponse.data);
-          await OrderComplainModel.create(
+          const complainToCreate = new OrderComplainModel(
             [
               {
                 order_id,
                 client_id: user_id,
                 complain,
-                images: imagesrcs,
               },
             ],
             { session },
           );
+
+          const imageStringArray: string[] = [];
+          images.forEach(async (singleImage) => {
+            try {
+              const form = new FormData();
+              form.append('objectType', 'order');
+              form.append('objectId', complainToCreate._id.toString());
+              form.append('file', createReadStream(singleImage.path));
+              const mediaResponse = await axios.post<string>(
+                `${process.env.MEDIA_ROOT_URL}/file`,
+                form,
+                {
+                  headers: { ...form.getHeaders() },
+                },
+              );
+              imageStringArray.push((await mediaResponse).data);
+            } catch (e) {
+              throw new BadRequestError(e.message);
+            } finally {
+              unlink(singleImage.path, () => null);
+            }
+          });
+          if (imageStringArray.length)
+            complainToCreate.images = imageStringArray;
+          await complainToCreate.save();
           const newOrder = await OrderModel.findByIdAndUpdate(
             order_id,
             { status: 4 },

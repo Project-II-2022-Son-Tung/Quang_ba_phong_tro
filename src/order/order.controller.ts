@@ -16,9 +16,10 @@ import { OpenAPI } from 'routing-controllers-openapi';
 import agenda from '../agenda';
 import { fileUploadOptions } from '../config/multer';
 import { CurrentUserOnRedisDocument } from '../user/currentUserOnRedis.interface';
+import { RequestServiceDto } from './dtos/requestService.dto';
 import { OrderService } from './order.service';
 
-@JsonController('/orderJob')
+@JsonController('/order')
 export class OrderController {
   private readonly orderService = new OrderService();
 
@@ -27,11 +28,14 @@ export class OrderController {
     description: 'accept an offer to order',
   })
   @Authorized(['client'])
-  @Post('/:jobOfferId', { transformResponse: false })
+  @Post('/acceptOffer/:jobOfferId', { transformResponse: false })
   async orderJobByOffer(
     @CurrentUser({ required: true }) user: CurrentUserOnRedisDocument,
     @Param('jobOfferId') job_offer_id: string,
-    @Body() body,
+    @Body()
+    body: {
+      note: string;
+    },
   ) {
     try {
       const result = await this.orderService.acceptOfferToOrder(
@@ -181,20 +185,40 @@ export class OrderController {
       if (jobs.length > 0) {
         jobs[0].remove();
       }
-      console.log(images);
-      console.log(body);
-      return 'ds';
-      // return this.orderService.complainOrder(
-      //   user.type,
-      //   user._id,
-      //   job_order_id,
-      //   body.note,
-      //   images,
-      // );
+      return this.orderService.complainOrder(
+        user.type,
+        user._id,
+        job_order_id,
+        body.note,
+        images,
+      );
+    } catch (e) {
+      if (e instanceof ForbiddenError) throw new ForbiddenError(e.message);
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  @OpenAPI({
+    security: [{ BearerAuth: [] }],
+    description: 'request a service to order',
+  })
+  @Authorized(['client'])
+  @Post('/request/:serviceId', { transformResponse: false })
+  async requestService(
+    @CurrentUser({ required: true }) user: CurrentUserOnRedisDocument,
+    @Param('serviceId') service_id: string,
+    @Body()
+    requestServiceDto: RequestServiceDto,
+  ) {
+    try {
+      return this.orderService.requestService(
+        user._id,
+        service_id,
+        requestServiceDto,
+      );
     } catch (e) {
       if (e instanceof ForbiddenError) throw new ForbiddenError(e.message);
       throw new BadRequestError(e.message);
     }
   }
 }
-

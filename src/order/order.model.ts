@@ -20,6 +20,7 @@ import { OrderType } from './order-type';
 export class Order {
   @prop({
     required: true,
+    unique: false,
     type: Types.ObjectId,
     ref: () => Client,
   })
@@ -27,6 +28,7 @@ export class Order {
 
   @prop({
     required: true,
+    unique: false,
     type: Types.ObjectId,
     ref: () => Client,
   })
@@ -34,6 +36,7 @@ export class Order {
 
   @prop({
     required: true,
+    unique: false,
     type: Types.ObjectId,
     ref: () => Product,
   })
