@@ -150,5 +150,4 @@ export class WalletController {
       throw new BadRequestError(e.message);
     }
   }
-
 }
