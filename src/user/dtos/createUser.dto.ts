@@ -1,6 +1,7 @@
 import { Expose } from 'class-transformer';
 import {
   IsEmail,
+  IsEnum,
   IsIn,
   IsNotEmpty,
   IsOptional,
@@ -8,6 +9,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { UserType } from '../enums/user-type.enum';
 
 export class CreateUserDto {
   @Expose()
@@ -21,6 +23,13 @@ export class CreateUserDto {
   @MinLength(4)
   @MaxLength(30)
   password: string;
+
+  @Expose()
+  @IsNotEmpty()
+  @IsEnum(UserType)
+  @IsString()
+  @IsIn(['admin', 'accountant'])
+  type: UserType;
 
   @Expose()
   @IsOptional()

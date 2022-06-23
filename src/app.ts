@@ -38,6 +38,7 @@ import { WalletController } from './wallet/wallet.controller';
 import { TransactionController } from './transaction/transaction.controller';
 import agenda from './agenda';
 import { GeoController } from './geo/geo.controller';
+import { AccountantController } from './accountant/accountant.controller';
 
 async function authorizationChecker(action: Action, roles: string[]) {
   const req: Request = action.request;
@@ -123,6 +124,7 @@ async function bootstrap() {
       OrderController,
       WalletController,
       TransactionController,
+      AccountantController
     ],
     authorizationChecker,
     currentUserChecker,

@@ -8,11 +8,10 @@ import { ChangeProfileDto } from './dtos/changeProfile.dto';
 import { ChangePasswordDto } from './dtos/changePassword.dto';
 import { Mailer } from '../helper/mailer';
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
-import { UserStatus } from './user-status.enum';
+import { UserStatus } from './enums/user-status.enum';
 import { RegisterUserDto } from './dtos/registerUser.dto';
-import { UserType } from './user-type.enum';
+import { UserType } from './enums/user-type.enum';
 import { ClientModel } from '../clients/client.model';
-import { AdminModel } from './admin.model';
 import { sendRegisterUserVerifyEmailQueue } from './queues/registerUser/sendRegisterUserVerifyEmail.queue';
 import { sendVerifySucceedEmailQueue } from './queues/verifySucceed/sendVerifySucceedEmail.queue';
 import { CreateUserDto } from './dtos/createUser.dto';
@@ -36,8 +35,8 @@ export class UserRepository {
       .lean();
   }
 
-  async getAdminByEmail(email: string): Promise<UserDocument | null> {
-    return AdminModel.findOne({ email, del_flag: false }).lean();
+  async getCrmUserByEmail(email: string): Promise<UserDocument | null> {
+    return UserModel.findOne({ email, del_flag: false }).lean();
   }
 
   async register(createUserDto: RegisterUserDto): Promise<void> {
@@ -70,11 +69,11 @@ export class UserRepository {
     }
   }
 
-  async createAdmin(createUserDto: CreateUserDto): Promise<void> {
+  async createCrmUser(createUserDto: CreateUserDto): Promise<void> {
     let raw_password: string;
     if (createUserDto.password) raw_password = createUserDto.password;
     else {
-      raw_password = await cryptoRandomString({
+      raw_password = cryptoRandomString({
         length: 8,
         type: 'alphanumeric',
       });
@@ -83,7 +82,6 @@ export class UserRepository {
     const status = UserStatus.ACTIVE;
     const del_flag = false;
     const create_time = new Date();
-    const type = UserType.ADMIN;
     const active_token = uuidv4();
     const api_key = uuidv4();
 
@@ -93,7 +91,6 @@ export class UserRepository {
       status,
       del_flag,
       create_time,
-      type,
       active_token,
       api_key,
     });
@@ -102,6 +99,7 @@ export class UserRepository {
       await sendCreateNewAdminAccountEmailQueue.add({
         user_email: userCreated.email,
         user_fullname: userCreated.fullname,
+        user_type: userCreated.type,
         user_raw_password: raw_password,
       });
     }
@@ -114,11 +112,11 @@ export class UserRepository {
     await ClientModel.findOneAndUpdate(query, { ...changeProfileDto }).exec();
   }
 
-  async changeAdminProfile(
+  async changeCrmUserProfile(
     query: Record<string, unknown>,
     changeProfileDto: ChangeProfileDto,
   ) {
-    await AdminModel.findOneAndUpdate(query, { ...changeProfileDto }).exec();
+    await UserModel.findOneAndUpdate(query, { ...changeProfileDto }).exec();
   }
 
   async verifyActive(active_token: string) {

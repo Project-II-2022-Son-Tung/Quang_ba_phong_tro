@@ -6,9 +6,9 @@ import {
   DocumentType,
 } from '@typegoose/typegoose';
 import mongooseUniqueValidator from 'mongoose-unique-validator';
-import { UserSex } from './user-sex.enum';
-import { UserStatus } from './user-status.enum';
-import { UserType } from './user-type.enum';
+import { UserSex } from './enums/user-sex.enum';
+import { UserStatus } from './enums/user-status.enum';
+import { UserType } from './enums/user-type.enum';
 
 @modelOptions({
   options: { allowMixed: 0 },

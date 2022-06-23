@@ -10,7 +10,8 @@ class Mailer {
 
   private static readonly user = process.env.MAIL_USER as string;
 
-  private static readonly user_address = process.env.MAIL_USER_ADDRESS as string;
+  private static readonly user_address = process.env
+    .MAIL_USER_ADDRESS as string;
 
   private static readonly password = process.env.MAIL_PASS as string;
 
@@ -105,17 +106,19 @@ class Mailer {
     await transporter.sendMail(option);
   }
 
-  public static async createAdminAccount(
+  public static async createCrmUserAccount(
     receiver: string,
     name: string,
+    user_type: string,
     raw_password: string,
   ): Promise<void> {
-    const filePath = `${process.env.HTML_FILES_ROOT}/createNewAdmin.html`;
+    const filePath = `${process.env.HTML_FILES_ROOT}/createNewCrmUser.html`;
     const source = readFileSync(filePath, 'utf-8').toString();
     const template = handlebars.compile(source);
     const replacements = {
       user_email: `${receiver}`,
       user_name: `${name} `,
+      user_type: `${user_type}`,
       user_raw_password: `${raw_password}`,
       login_site: `${process.env.WEBSITE_DOMAIN_PATH}/auth/login`,
     };
