@@ -8,8 +8,13 @@ export async function sendCreateNewAdminAccountEmailProcessor(
 ): Promise<void> {
   try {
     const { data } = job;
-    const { user_email, user_fullname, user_raw_password } = data;
-    await Mailer.createAdminAccount(user_email, user_fullname, user_raw_password);
+    const { user_email, user_fullname, user_type, user_raw_password } = data;
+    await Mailer.createCrmUserAccount(
+      user_email,
+      user_fullname,
+      user_type,
+      user_raw_password,
+    );
   } catch (e) {
     throw new BadRequestError(e.message);
   }

@@ -1,5 +1,5 @@
 import { DocumentType } from '@typegoose/typegoose';
-import { UserType } from './user-type.enum';
+import { UserType } from './enums/user-type.enum';
 
 export interface currentUserOnRedis {
   _id: string;

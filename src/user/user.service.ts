@@ -9,7 +9,7 @@ import { ChangeProfileDto } from './dtos/changeProfile.dto';
 import { UserDocument } from './user.model';
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
 import { RegisterUserDto } from './dtos/registerUser.dto';
-import { UserType } from './user-type.enum';
+import { UserType } from './enums/user-type.enum';
 import { toSlugConverter } from '../helper/toSlugConverter';
 import { CurrentUserOnRedisDocument } from './currentUserOnRedis.interface';
 import { CreateUserDto } from './dtos/createUser.dto';
@@ -21,8 +21,8 @@ export class UserService {
     return this.userRepository.register(registerUserDto);
   }
 
-  async createAdminAccount(createUserDto: CreateUserDto) {
-    return this.userRepository.createAdmin(createUserDto);
+  async createCrmUserAccount(createUserDto: CreateUserDto) {
+    return this.userRepository.createCrmUser(createUserDto);
   }
 
   async getUserByEmailAndRole(
@@ -30,7 +30,7 @@ export class UserService {
     role: string,
   ): Promise<UserDocument> {
     if (role === 'client') return this.userRepository.getClientByEmail(email);
-    return this.userRepository.getAdminByEmail(email);
+    return this.userRepository.getCrmUserByEmail(email);
   }
 
   async changePassword(user_id: string, changePasswordDto: ChangePasswordDto) {
@@ -76,7 +76,7 @@ export class UserService {
     }
     if (user.type === UserType.CLIENT)
       return this.userRepository.changeClientProfile(query, changeProfileDto);
-    return this.userRepository.changeAdminProfile(query, changeProfileDto);
+    return this.userRepository.changeCrmUserProfile(query, changeProfileDto);
   }
 
   async verifyActive(activeToken: string) {

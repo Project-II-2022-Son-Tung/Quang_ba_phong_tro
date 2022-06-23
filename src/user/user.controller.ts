@@ -31,7 +31,7 @@ export class UserController {
     security: [{ BearerAuth: [] }],
     description: 'Gets details of current logged-in user ',
   })
-  @Authorized(['admin', 'client'])
+  @Authorized(['admin', 'client', 'accountant'])
   getUserByEmail(
     @CurrentUser({ required: true }) user: CurrentUserOnRedisDocument,
   ) {
@@ -52,14 +52,14 @@ export class UserController {
   }
 
   @Authorized(['admin'])
-  @Post('/createAdmin', { transformResponse: false })
+  @Post('/createCrmUser', { transformResponse: false })
   @OpenAPI({
     security: [{ BearerAuth: [] }],
-    description: 'Create new admin account ',
+    description: 'Create new crm user (admin/accountant) account ',
   })
-  async createNewAdminAccount(@Body() createUserDto: CreateUserDto) {
+  async createNewCrmUserAccount(@Body() createUserDto: CreateUserDto) {
     try {
-      await this.userService.createAdminAccount(createUserDto);
+      await this.userService.createCrmUserAccount(createUserDto);
       return {
         message: 'Success',
       };
@@ -72,7 +72,7 @@ export class UserController {
     security: [{ BearerAuth: [] }],
     description: 'Change password of current logged-in user',
   })
-  @Authorized(['admin', 'client'])
+  @Authorized(['admin', 'client', 'accountant'])
   @Patch('/change/password')
   async changePassword(
     @CurrentUser({ required: true }) user: CurrentUserOnRedisDocument,
@@ -92,7 +92,7 @@ export class UserController {
     security: [{ BearerAuth: [] }],
     description: 'Change profile (except password) of current logged-in user',
   })
-  @Authorized(['admin', 'client'])
+  @Authorized(['admin', 'client', 'accountant'])
   @Put('/change/profile')
   async changeProfile(
     @Body() changeProfileDto: ChangeProfileDto,

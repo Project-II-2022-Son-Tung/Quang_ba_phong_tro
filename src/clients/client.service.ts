@@ -1,7 +1,7 @@
 import { CategoryService } from '../category/category.service';
 import { CurrentUserOnRedisDocument } from '../user/currentUserOnRedis.interface';
 /* eslint-disable dot-notation */
-import { UserStatus } from '../user/user-status.enum';
+import { UserStatus } from '../user/enums/user-status.enum';
 import { UserModelUnselectableFields } from '../user/user.model';
 import { ClientDocument } from './client.model';
 import { ClientRepository } from './client.repository';
