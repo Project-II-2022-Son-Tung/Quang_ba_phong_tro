@@ -1,7 +1,8 @@
 import { DocumentType } from '@typegoose/typegoose';
-import { City, CityModel } from './city.model';
+import { Province, ProvinceModel } from './province.model';
 import { Country, CountryModel } from './country.model';
 import { District, DistrictModel } from './district.model';
+import { WardModel } from './ward.model';
 
 export class GeoRepository {
   async getCountryByCode(code: string): Promise<DocumentType<Country> | null> {
@@ -14,8 +15,10 @@ export class GeoRepository {
       .lean();
   }
 
-  async getCityByCode(code: string): Promise<DocumentType<City> | null> {
-    return CityModel.findOne({ code })
+  async getProvinceByCode(
+    code: string,
+  ): Promise<DocumentType<Province> | null> {
+    return ProvinceModel.findOne({ code })
       .select({
         _id: 0,
         code: 1,
@@ -25,8 +28,8 @@ export class GeoRepository {
       .lean();
   }
 
-  async getCityByCountryCode(country_code: string) {
-    return CityModel.find({ country_code })
+  async getProvinceByCountryCode(country_code: string) {
+    return ProvinceModel.find({ country_code })
       .select({
         _id: 0,
         code: 1,
@@ -44,18 +47,40 @@ export class GeoRepository {
         _id: 0,
         code: 1,
         name: 1,
-        city_code: 1,
+        province_code: 1,
       })
       .lean();
   }
 
-  async getDistrictByCityCode(city_code: string) {
-    return DistrictModel.find({ city_code })
+  async getDistrictByProvinceCode(province_code: string) {
+    return DistrictModel.find({ province_code })
       .select({
         _id: 0,
         code: 1,
         name: 1,
-        city_code: 1,
+        province_code: 1,
+      })
+      .lean();
+  }
+
+  async getWardByCode(code: string): Promise<DocumentType<District> | null> {
+    return WardModel.findOne({ code })
+      .select({
+        _id: 0,
+        code: 1,
+        name: 1,
+        district_code: 1,
+      })
+      .lean();
+  }
+
+  async getWardByDistrictCode(district_code: string) {
+    return WardModel.find({ district_code })
+      .select({
+        _id: 0,
+        code: 1,
+        name: 1,
+        district_code: 1,
       })
       .lean();
   }
@@ -64,11 +89,15 @@ export class GeoRepository {
     return CountryModel.find().lean();
   }
 
-  async getAllCities() {
-    return CityModel.find().lean();
+  async getAllProvinces() {
+    return ProvinceModel.find().lean();
   }
 
   async getAllDistricts() {
     return DistrictModel.find().lean();
+  }
+
+  async getAllWards() {
+    return WardModel.find().lean();
   }
 }

@@ -1,6 +1,6 @@
 import { getModelForClass, prop } from '@typegoose/typegoose';
 
-export class City {
+export class Province {
   @prop()
   code: string;
 
@@ -11,4 +11,4 @@ export class City {
   country_code: string;
 }
 
-export const CityModel = getModelForClass(City);
+export const ProvinceModel = getModelForClass(Province);

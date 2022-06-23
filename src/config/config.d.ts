@@ -1,7 +1,7 @@
 declare global {
   namespace NodeJS {
     interface Global {
-      io: any;
+      io: unknown;
     }
     interface ProcessEnv {
       // Environment

@@ -8,16 +8,21 @@ import { ChangePasswordDto } from './dtos/changePassword.dto';
 import { ChangeProfileDto } from './dtos/changeProfile.dto';
 import { UserDocument } from './user.model';
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
-import { CreateUserDto } from './dtos/createUser.dto';
+import { RegisterUserDto } from './dtos/registerUser.dto';
 import { UserType } from './user-type.enum';
 import { toSlugConverter } from '../helper/toSlugConverter';
 import { CurrentUserOnRedisDocument } from './currentUserOnRedis.interface';
+import { CreateUserDto } from './dtos/createUser.dto';
 
 export class UserService {
   private readonly userRepository = new UserRepository();
 
-  async createUser(createUserDto: CreateUserDto) {
-    return this.userRepository.create(createUserDto);
+  async registerUser(registerUserDto: RegisterUserDto) {
+    return this.userRepository.register(registerUserDto);
+  }
+
+  async createAdminAccount(createUserDto: CreateUserDto) {
+    return this.userRepository.createAdmin(createUserDto);
   }
 
   async getUserByEmailAndRole(

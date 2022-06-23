@@ -1,7 +1,6 @@
 import {
   JsonController,
   Get,
-  Authorized,
   QueryParam,
   BadRequestError,
   ForbiddenError,
@@ -17,29 +16,30 @@ export class ClientController {
   private readonly clientService = new ClientService();
 
   @OpenAPI({
-    security: [{ BearerAuth: [] }],
     description: 'Get Client list with filter',
   })
-  @Authorized(['admin', 'client'])
   @Get('', { transformResponse: false })
   async getClientList(
-    @CurrentUser({ required: true }) user: CurrentUserOnRedisDocument,
+    @CurrentUser({ required: false }) user: CurrentUserOnRedisDocument,
     @QueryParam('page')
     page: number,
     @QueryParam('limit')
     limit: number,
     @QueryParam('category')
     category: string,
+    @QueryParam('address')
+    address: string,
     @QueryParam('select')
     select: string,
   ) {
     try {
       if (!page || !limit) return null;
       return this.clientService.getClientList(
-        user.type,
+        user,
         page,
         limit,
         category,
+        address,
         select,
       );
     } catch (e) {
@@ -49,17 +49,15 @@ export class ClientController {
   }
 
   @OpenAPI({
-    security: [{ BearerAuth: [] }],
     description: 'Get Client Detail',
   })
-  @Authorized(['admin', 'client'])
   @Get('/:client_id', { transformResponse: false })
   async getClientDetail(
-    @CurrentUser({ required: true }) user: CurrentUserOnRedisDocument,
+    @CurrentUser({ required: false }) user: CurrentUserOnRedisDocument,
     @Param('client_id') client_id: string,
   ) {
     try {
-      return this.clientService.getClientDetailById(user.type, client_id);
+      return this.clientService.getClientDetailById(user, client_id);
     } catch (e) {
       if (e instanceof ForbiddenError) throw new ForbiddenError(e.message);
       throw new BadRequestError(e.message);

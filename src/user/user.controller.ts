@@ -13,14 +13,14 @@ import {
 } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
 import { UserService } from './user.service';
-import { UserDocument } from './user.model';
 import { ChangePasswordDto } from './dtos/changePassword.dto';
 import { ChangeProfileDto } from './dtos/changeProfile.dto';
 import { fileUploadOptions } from '../config/multer';
 import { EmailDto } from './dtos/email.dto';
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
-import { CreateUserDto } from './dtos/createUser.dto';
+import { RegisterUserDto } from './dtos/registerUser.dto';
 import { CurrentUserOnRedisDocument } from './currentUserOnRedis.interface';
+import { CreateUserDto } from './dtos/createUser.dto';
 
 @JsonController('/user')
 export class UserController {
@@ -32,15 +32,34 @@ export class UserController {
     description: 'Gets details of current logged-in user ',
   })
   @Authorized(['admin', 'client'])
-  getUserByEmail(@CurrentUser({ required: true }) user: CurrentUserOnRedisDocument) {
-    return this.userService.getUserByEmailAndRole(user.email,user.type);
+  getUserByEmail(
+    @CurrentUser({ required: true }) user: CurrentUserOnRedisDocument,
+  ) {
+    return this.userService.getUserByEmailAndRole(user.email, user.type);
   }
 
   @Post('', { transformResponse: false })
   @OpenAPI({ description: 'Register new account ' })
-  async register(@Body() createUserDto: CreateUserDto) {
+  async register(@Body() createUserDto: RegisterUserDto) {
     try {
-      await this.userService.createUser(createUserDto);
+      await this.userService.registerUser(createUserDto);
+      return {
+        message: 'Success',
+      };
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  @Authorized(['admin'])
+  @Post('/createAdmin', { transformResponse: false })
+  @OpenAPI({
+    security: [{ BearerAuth: [] }],
+    description: 'Create new admin account ',
+  })
+  async createNewAdminAccount(@Body() createUserDto: CreateUserDto) {
+    try {
+      await this.userService.createAdminAccount(createUserDto);
       return {
         message: 'Success',
       };

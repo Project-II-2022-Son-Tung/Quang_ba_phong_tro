@@ -1,14 +1,20 @@
 /* eslint-disable no-param-reassign */
-/* eslint-disable dot-notation */
 import { PopulateOptions } from 'mongoose';
 import { BadRequestError } from 'routing-controllers';
+import { CurrentUserOnRedisDocument } from '../user/currentUserOnRedis.interface';
 import { ProductStatus } from '../product/product-status.enum';
 import { toSlugConverter } from '../helper/toSlugConverter';
 import { CreateServiceDto } from './dtos/createService.dto';
 import { ServiceProductRepository } from './serviceProduct.repository';
+import { AdminConfigService } from '../admin-config/adminConfig.service';
+import { CategoryService } from '../category/category.service';
 
 export class ServiceProductService {
   private readonly serviceProductRepository = new ServiceProductRepository();
+
+  private readonly adminConfigService = new AdminConfigService();
+
+  private readonly categoryService = new CategoryService();
 
   async createService(client_id: string, createServiceDto: CreateServiceDto) {
     if (
@@ -20,6 +26,10 @@ export class ServiceProductService {
         slug: toSlugConverter(obj.name),
       })); // TODO : log new skills added by user to admins
     }
+    Object.assign(createServiceDto, {
+      status:
+        await this.adminConfigService.getInitialCreateProductServiceStatus(),
+    });
     return this.serviceProductRepository.createService(
       client_id,
       createServiceDto,
@@ -29,16 +39,20 @@ export class ServiceProductService {
   async getServiceList(
     page: number,
     limit: number,
-    curUserType: string,
+    currentUser: CurrentUserOnRedisDocument,
     user_id: string,
-    category: string,
+    categorySlug: string,
     providing_method: string,
     fee_range: string,
+    name: string,
     sort_by: string,
     select: string,
   ) {
-    const query = { status: { $not: { $eq: ProductStatus.DELETED } } };
-    const selectQuery = {};
+    const query = { status: ProductStatus.ACTIVE };
+    const selectQuery: {
+      category?: number;
+      user_id?: number;
+    } = {};
     const populateQuery: PopulateOptions[] = [
       {
         path: 'user_id',
@@ -47,16 +61,21 @@ export class ServiceProductService {
       { path: 'category', select: '-description' },
     ];
     if (user_id) Object.assign(query, { user_id: { $in: user_id.split(',') } });
-    if (category)
-      Object.assign(query, { category: { $in: category.split(',') } });
+    if (categorySlug) {
+      const categoriesIDArray =
+        await this.categoryService.getCategoriesIDBySlugString(categorySlug);
+      Object.assign(query, { category: { $in: categoriesIDArray } });
+    }
+    if (name)
+      Object.assign(query, { name: { $regex: `.*${name}.*`, $options: 'i' } });
     if (providing_method)
       Object.assign(query, {
         providing_method: { $in: providing_method.split(',') },
       });
-    // eslint-disable-next-line eqeqeq
-    if (curUserType == 'client') {
-      Object.assign(query, { status: ProductStatus.ACTIVE });
-      if (selectQuery['status'] === 1) selectQuery['status'] = 0;
+    if (currentUser && currentUser.type === 'admin') {
+      Object.assign(query, {
+        status: { $not: { $eq: ProductStatus.DELETED } },
+      });
     }
     if (fee_range) {
       const [minFee, maxFee] = fee_range.split('-').map(Number);
@@ -70,8 +89,8 @@ export class ServiceProductService {
       fieldsArray.forEach((value) => {
         selectQuery[value] = 1;
       });
-      if (!selectQuery['category']) populateQuery.pop();
-      if (!selectQuery['user_id']) populateQuery.shift();
+      if (!selectQuery.category) populateQuery.pop();
+      if (!selectQuery.user_id) populateQuery.shift();
     }
     const total =
       await this.serviceProductRepository.getNumberOfServiceWithFilter(query);
@@ -149,15 +168,19 @@ export class ServiceProductService {
     );
   }
 
-  async getOtherUserServiceDetail(user_type: string, service_id: string) {
+  async getOtherUserServiceDetail(
+    currentUser: CurrentUserOnRedisDocument,
+    service_id: string,
+  ) {
     const query = {
       _id: service_id,
-      status: { $not: { $eq: ProductStatus.DELETED } },
+      status: ProductStatus.ACTIVE,
     };
     const selectQuery = {};
-    if (user_type === 'client') {
-      Object.assign(query, { status: ProductStatus.ACTIVE });
-      Object.assign(selectQuery, { status: 0 });
+    if (currentUser && currentUser.type === 'admin') {
+      Object.assign(query, {
+        status: { $not: { $eq: ProductStatus.DELETED } },
+      });
     }
     const populateQuery: PopulateOptions[] = [
       {

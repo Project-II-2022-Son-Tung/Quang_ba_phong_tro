@@ -2,16 +2,21 @@
 import { hashSync, compareSync } from 'bcrypt';
 import { BadRequestError } from 'routing-controllers';
 import { v4 as uuidv4 } from 'uuid';
+import cryptoRandomString from 'crypto-random-string';
 import { UserDocument, UserModel } from './user.model';
 import { ChangeProfileDto } from './dtos/changeProfile.dto';
 import { ChangePasswordDto } from './dtos/changePassword.dto';
 import { Mailer } from '../helper/mailer';
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
 import { UserStatus } from './user-status.enum';
-import { CreateUserDto } from './dtos/createUser.dto';
+import { RegisterUserDto } from './dtos/registerUser.dto';
 import { UserType } from './user-type.enum';
 import { ClientModel } from '../clients/client.model';
 import { AdminModel } from './admin.model';
+import { sendRegisterUserVerifyEmailQueue } from './queues/registerUser/sendRegisterUserVerifyEmail.queue';
+import { sendVerifySucceedEmailQueue } from './queues/verifySucceed/sendVerifySucceedEmail.queue';
+import { CreateUserDto } from './dtos/createUser.dto';
+import { sendCreateNewAdminAccountEmailQueue } from './queues/createUser/sendCreateNewAdminAccountEmail.queue';
 
 export class UserRepository {
   private hashPassword(password: string, rounds: number): string {
@@ -35,7 +40,7 @@ export class UserRepository {
     return AdminModel.findOne({ email, del_flag: false }).lean();
   }
 
-  async create(createUserDto: CreateUserDto): Promise<void> {
+  async register(createUserDto: RegisterUserDto): Promise<void> {
     const hashed_password = this.hashPassword(createUserDto.password, 10);
     const type = UserType.CLIENT;
     const del_flag = false;
@@ -57,19 +62,62 @@ export class UserRepository {
     const userCreated = await user.save();
 
     if (userCreated) {
-      await Mailer.createNewUser(
-        userCreated.email,
-        userCreated.fullname,
-        `${process.env.WEBSITE_DOMAIN_PATH}/user/verify/${userCreated.active_token}`,
-      );
+      await sendRegisterUserVerifyEmailQueue.add({
+        user_email: userCreated.email,
+        user_fullname: userCreated.fullname,
+        redirect_link: `${process.env.WEBSITE_DOMAIN_PATH}/user/register/verify/${userCreated.active_token}`,
+      });
     }
   }
 
-  async changeClientProfile(query: Object, changeProfileDto: ChangeProfileDto) {
+  async createAdmin(createUserDto: CreateUserDto): Promise<void> {
+    let raw_password: string;
+    if (createUserDto.password) raw_password = createUserDto.password;
+    else {
+      raw_password = await cryptoRandomString({
+        length: 8,
+        type: 'alphanumeric',
+      });
+    }
+    const hashed_password = this.hashPassword(raw_password, 10);
+    const status = UserStatus.ACTIVE;
+    const del_flag = false;
+    const create_time = new Date();
+    const type = UserType.ADMIN;
+    const active_token = uuidv4();
+    const api_key = uuidv4();
+
+    const userCreated = new UserModel({
+      ...createUserDto,
+      hashed_password,
+      status,
+      del_flag,
+      create_time,
+      type,
+      active_token,
+      api_key,
+    });
+    await userCreated.save();
+    if (userCreated) {
+      await sendCreateNewAdminAccountEmailQueue.add({
+        user_email: userCreated.email,
+        user_fullname: userCreated.fullname,
+        user_raw_password: raw_password,
+      });
+    }
+  }
+
+  async changeClientProfile(
+    query: Record<string, unknown>,
+    changeProfileDto: ChangeProfileDto,
+  ) {
     await ClientModel.findOneAndUpdate(query, { ...changeProfileDto }).exec();
   }
 
-  async changeAdminProfile(query: Object, changeProfileDto: ChangeProfileDto) {
+  async changeAdminProfile(
+    query: Record<string, unknown>,
+    changeProfileDto: ChangeProfileDto,
+  ) {
     await AdminModel.findOneAndUpdate(query, { ...changeProfileDto }).exec();
   }
 
@@ -91,7 +139,10 @@ export class UserRepository {
           'Activation unsuccesfully : invalid ActiveToken or user has been activated before! This error will also be thrown in the case that user has been deleted !',
         );
       }
-      await Mailer.verifySucceed(user.email, user.fullname);
+      await sendVerifySucceedEmailQueue.add({
+        user_email: user.email,
+        user_fullname: user.fullname,
+      });
       return 'Kích hoạt tài khoản thành công';
     } catch (e) {
       throw new BadRequestError(e.message);

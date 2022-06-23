@@ -1,3 +1,5 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable dot-notation */
 /* eslint-disable no-else-return */
 /* eslint-disable @typescript-eslint/ban-types */
@@ -75,7 +77,7 @@ export class OrderService {
   async requestService(
     user_id: string,
     service_id: string,
-    requestServiceDto: RequestServiceDto
+    requestServiceDto: RequestServiceDto,
   ): Promise<OrderDocument> {
     const service = await ServiceProductModel.findById(service_id).lean();
     if (!service || service.status === 2 || service.status === 3)

@@ -1,7 +1,9 @@
 import { Expose } from 'class-transformer';
 import {
   IsEmail,
+  IsIn,
   IsNotEmpty,
+  IsOptional,
   IsString,
   MaxLength,
   MinLength,
@@ -14,23 +16,19 @@ export class CreateUserDto {
   email: string;
 
   @Expose()
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MinLength(4)
   @MaxLength(30)
   password: string;
 
   @Expose()
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  @MaxLength(20)
-  @MinLength(10)
   phone: string;
 
   @Expose()
   @IsNotEmpty()
   @IsString()
-  @MaxLength(40)
-  @MinLength(1)
   fullname: string;
 }

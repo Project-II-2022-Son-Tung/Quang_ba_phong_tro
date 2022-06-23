@@ -1,6 +1,6 @@
 import { getModelForClass, prop } from '@typegoose/typegoose';
 
-export class District {
+export class Ward {
   @prop()
   code: string;
 
@@ -8,7 +8,7 @@ export class District {
   name: string;
 
   @prop()
-  city_code: string;
+  district_code: string;
 }
 
-export const DistrictModel = getModelForClass(District);
+export const WardModel = getModelForClass(Ward);

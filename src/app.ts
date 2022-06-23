@@ -24,18 +24,20 @@ import * as socketio from 'socket.io';
 import { redisClient } from './config/redis-client';
 import { AuthController } from './auth/auth.controller';
 import { UserController } from './user/user.controller';
-import { GeoController } from './geo/geo.controller';
-import { UserModel } from './user/user.model';
 import { CategoryController } from './category/category.controller';
 import { SkillController } from './skill/skill.controller';
 import { ClientController } from './clients/client.controller';
 import { ServiceProductController } from './serviceProduct/serviceProduct.controller';
 import { CurrentUserOnRedisDocument } from './user/currentUserOnRedis.interface';
+import { JobProductController } from './jobProduct/jobProduct.controller';
+import { NewsController } from './news/news.controller';
+import { TicketController } from './ticket/ticket.controller';
 import { OfferController } from './Offer/offer.controller';
 import { OrderController } from './order/order.controller';
 import { WalletController } from './wallet/wallet.controller';
 import { TransactionController } from './transaction/transaction.controller';
 import agenda from './agenda';
+import { GeoController } from './geo/geo.controller';
 
 async function authorizationChecker(action: Action, roles: string[]) {
   const req: Request = action.request;
@@ -61,11 +63,11 @@ async function authorizationChecker(action: Action, roles: string[]) {
 }
 async function currentUserChecker(action: Action) {
   const req: Request = action.request;
-  const authHeader = req.headers.authorization;
-  const [, token] = authHeader.split(' ');
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const curUser: any = jwt.decode(token);
   try {
+    const authHeader = req.headers.authorization;
+    const [, token] = authHeader.split(' ');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const curUser: any = jwt.decode(token);
     const user = {
       _id: curUser.user_id,
       email: curUser.email,
@@ -109,11 +111,14 @@ async function bootstrap() {
     controllers: [
       UserController,
       AuthController,
-      // GeoController,
+      GeoController,
       CategoryController,
       SkillController,
       ClientController,
       ServiceProductController,
+      JobProductController,
+      NewsController,
+      TicketController,
       OfferController,
       OrderController,
       WalletController,
