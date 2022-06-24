@@ -42,7 +42,6 @@ export const AppDataSource = new DataSource({
         entities: [Admin, User, Owner, UserHistory, RoomRate, RoomImage, Room, RateImage, OwnerRate, OwnerHistory, Invite, Identification, Contract, Wallet],    
         migrations: [path.join(__dirname, '/migrations/*')]
 });
-
 // export const RedisClient = createClient(
 //   __prod__ ? {
 //     url: process.env.REDIS_URL
