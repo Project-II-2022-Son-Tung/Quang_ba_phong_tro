@@ -9,7 +9,7 @@ import { UserResolver } from "./resolvers/user";
 import session from 'express-session';
 import connectRedis from 'connect-redis';
 import { MyContext } from "./types/MyContext";
-import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
+import { ApolloServerPluginLandingPageGraphQLPlayground, ApolloServerPluginLandingPageProductionDefault } from "apollo-server-core";
 import { createClient } from "redis";
 import { AdminResolver } from "./resolvers/admin";
 import { OwnerResolver } from "./resolvers/owner";
@@ -84,7 +84,9 @@ const main = async () => {
 		}),
 		context: ({ req, res }): MyContext => ({ req, res, connection: AppDataSource.manager }),
 		plugins: [__prod__ 
-				  ? ApolloServerPluginLandingPageGraphQLPlayground()
+				  ? ApolloServerPluginLandingPageProductionDefault({
+					footer: false,
+				  })
 				  : ApolloServerPluginLandingPageGraphQLPlayground()],
 		
 	});

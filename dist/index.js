@@ -65,7 +65,9 @@ const main = async () => {
         }),
         context: ({ req, res }) => ({ req, res, connection: data_source_1.AppDataSource.manager }),
         plugins: [constants_1.__prod__
-                ? (0, apollo_server_core_1.ApolloServerPluginLandingPageGraphQLPlayground)()
+                ? (0, apollo_server_core_1.ApolloServerPluginLandingPageProductionDefault)({
+                    footer: false,
+                })
                 : (0, apollo_server_core_1.ApolloServerPluginLandingPageGraphQLPlayground)()],
     });
     await apolloServer.start();
