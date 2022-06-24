@@ -41,7 +41,7 @@ const main = async () => {
         console.log('Redis connection error.');
     });
     redisClient.on('connect', () => {
-        console.log(`Redis client connected on port 6379!`);
+        console.log(`Redis client connected`);
     });
     redisClient.connect();
     const RedisStore = (0, connect_redis_1.default)(express_session_1.default);
@@ -65,9 +65,7 @@ const main = async () => {
         }),
         context: ({ req, res }) => ({ req, res, connection: data_source_1.AppDataSource.manager }),
         plugins: [constants_1.__prod__
-                ? (0, apollo_server_core_1.ApolloServerPluginLandingPageProductionDefault)({
-                    footer: false,
-                })
+                ? (0, apollo_server_core_1.ApolloServerPluginLandingPageGraphQLPlayground)()
                 : (0, apollo_server_core_1.ApolloServerPluginLandingPageGraphQLPlayground)()],
     });
     await apolloServer.start();

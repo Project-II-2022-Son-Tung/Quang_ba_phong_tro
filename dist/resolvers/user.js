@@ -351,7 +351,7 @@ let UserResolver = class UserResolver {
         return {
             code: 200,
             success: true,
-            message: "User updated successfully",
+            message: "User updated successfully !",
             user
         };
     }

@@ -52,7 +52,7 @@ const main = async () => {
 	});
 
 	redisClient.on('connect', () => {
-	console.log(`Redis client connected on port 6379!`);
+	console.log(`Redis client connected`);
 	});
 
 	redisClient.connect();
