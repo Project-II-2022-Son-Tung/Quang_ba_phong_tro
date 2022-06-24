@@ -1,10 +1,11 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
-
-export class Initialize1656094980896 implements MigrationInterface {
-    name = 'Initialize1656094980896'
-
-    public async up(queryRunner: QueryRunner): Promise<void> {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Initialize1656095778187 = void 0;
+class Initialize1656095778187 {
+    name = 'Initialize1656095778187';
+    async up(queryRunner) {
         await queryRunner.query(`CREATE TABLE "admin" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "username" character varying NOT NULL, "email" character varying NOT NULL, "password" character varying NOT NULL, "fullName" character varying NOT NULL, "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "UQ_5e568e001f9d1b91f67815c580f" UNIQUE ("username"), CONSTRAINT "UQ_de87485f6489f5d0995f5841952" UNIQUE ("email"), CONSTRAINT "PK_e032310bcef831fb83101899b10" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TYPE "public"."wallet_status_enum" AS ENUM('ACTIVE', 'INACTIVE', 'LOCKED')`);
         await queryRunner.query(`CREATE TABLE "wallet" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "balance" integer NOT NULL, "availableBalance" integer NOT NULL, "status" "public"."wallet_status_enum" NOT NULL DEFAULT 'INACTIVE', "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "PK_bec464dd8d54c39c54fd32e2334" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "identification" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "serial" character varying NOT NULL, "issueDate" TIMESTAMP NOT NULL, "issuedBy" character varying NOT NULL, "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "UQ_44fbcfb27a8626b4bf4db0a222d" UNIQUE ("serial"), CONSTRAINT "PK_fd49f15a74f96c6d17645c8810a" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "invite" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "timeOfCheck" TIMESTAMP NOT NULL, "status" character varying NOT NULL, "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "ownerId" uuid, "userId" uuid, "roomId" uuid, CONSTRAINT "PK_fc9fa190e5a3c5d80604a4f63e1" PRIMARY KEY ("id"))`);
@@ -40,8 +41,7 @@ export class Initialize1656094980896 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "contract" ADD CONSTRAINT "FK_a45df5a99d61f11c78719bd6129" FOREIGN KEY ("ownerId") REFERENCES "owner"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "contract" ADD CONSTRAINT "FK_a837a077c734b8f4106c6923685" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
     }
-
-    public async down(queryRunner: QueryRunner): Promise<void> {
+    async down(queryRunner) {
         await queryRunner.query(`ALTER TABLE "contract" DROP CONSTRAINT "FK_a837a077c734b8f4106c6923685"`);
         await queryRunner.query(`ALTER TABLE "contract" DROP CONSTRAINT "FK_a45df5a99d61f11c78719bd6129"`);
         await queryRunner.query(`ALTER TABLE "contract" DROP CONSTRAINT "FK_cf9839a50efcca56cff91d68852"`);
@@ -76,7 +76,9 @@ export class Initialize1656094980896 implements MigrationInterface {
         await queryRunner.query(`DROP TABLE "invite"`);
         await queryRunner.query(`DROP TABLE "identification"`);
         await queryRunner.query(`DROP TABLE "wallet"`);
+        await queryRunner.query(`DROP TYPE "public"."wallet_status_enum"`);
         await queryRunner.query(`DROP TABLE "admin"`);
     }
-
 }
+exports.Initialize1656095778187 = Initialize1656095778187;
+//# sourceMappingURL=1656095778187-Initialize.js.map

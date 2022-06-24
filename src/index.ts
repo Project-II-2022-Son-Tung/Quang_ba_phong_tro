@@ -13,10 +13,12 @@ import { ApolloServerPluginLandingPageGraphQLPlayground, ApolloServerPluginLandi
 import { createClient } from "redis";
 import { AdminResolver } from "./resolvers/admin";
 import { OwnerResolver } from "./resolvers/owner";
+import { RoomResolver } from "./resolvers/room";
 
 
 const main = async () => {
     await AppDataSource.initialize();
+	console.log("Initialized data source");
     if(__prod__) {
     await AppDataSource.runMigrations();
     }
@@ -79,7 +81,7 @@ const main = async () => {
 	
 	const apolloServer = new ApolloServer({
 		schema: await buildSchema({
-		  resolvers: [UserResolver, AdminResolver, OwnerResolver], 
+		  resolvers: [UserResolver, AdminResolver, OwnerResolver, RoomResolver], 
 		  validate: false
 		}),
 		context: ({ req, res }): MyContext => ({ req, res, connection: AppDataSource.manager }),
