@@ -1,6 +1,7 @@
 import { Field, Int, ObjectType } from "type-graphql";
 import { BaseEntity, Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { Districts } from "./Districts";
+import { Room } from "./Room";
 
 @ObjectType()
 @Entity()
@@ -37,6 +38,10 @@ export class Provinces extends BaseEntity {
     @Field(_type => [Districts])
     @OneToMany(() => Districts, (district) => district.province, { cascade: true })
     districts: Districts[];
+
+    @Field(_type=>Room)
+    @OneToMany(() => Room, (room) => room.province)
+    rooms: Room[];
 
     @Field(_type => Int, {nullable: true})
     @Column({ nullable: true})

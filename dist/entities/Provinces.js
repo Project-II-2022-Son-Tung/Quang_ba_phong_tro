@@ -13,6 +13,7 @@ exports.Provinces = void 0;
 const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
 const Districts_1 = require("./Districts");
+const Room_1 = require("./Room");
 let Provinces = class Provinces extends typeorm_1.BaseEntity {
     code;
     name;
@@ -22,6 +23,7 @@ let Provinces = class Provinces extends typeorm_1.BaseEntity {
     code_name;
     administrative_unit_id;
     districts;
+    rooms;
     administrative_region_id;
 };
 __decorate([
@@ -64,6 +66,11 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => Districts_1.Districts, (district) => district.province, { cascade: true }),
     __metadata("design:type", Array)
 ], Provinces.prototype, "districts", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(_type => Room_1.Room),
+    (0, typeorm_1.OneToMany)(() => Room_1.Room, (room) => room.province),
+    __metadata("design:type", Array)
+], Provinces.prototype, "rooms", void 0);
 __decorate([
     (0, type_graphql_1.Field)(_type => type_graphql_1.Int, { nullable: true }),
     (0, typeorm_1.Column)({ nullable: true }),

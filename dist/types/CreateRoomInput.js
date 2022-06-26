@@ -12,9 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateRoomInput = void 0;
 const type_graphql_1 = require("type-graphql");
 let CreateRoomInput = class CreateRoomInput {
-    street;
+    ward;
     district;
-    city;
+    province;
     address;
     size;
     floor;
@@ -38,7 +38,7 @@ let CreateRoomInput = class CreateRoomInput {
 __decorate([
     (0, type_graphql_1.Field)(),
     __metadata("design:type", String)
-], CreateRoomInput.prototype, "street", void 0);
+], CreateRoomInput.prototype, "ward", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     __metadata("design:type", String)
@@ -46,7 +46,7 @@ __decorate([
 __decorate([
     (0, type_graphql_1.Field)(),
     __metadata("design:type", String)
-], CreateRoomInput.prototype, "city", void 0);
+], CreateRoomInput.prototype, "province", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     __metadata("design:type", String)

@@ -13,11 +13,14 @@ exports.Room = void 0;
 const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
 const Contract_1 = require("./Contract");
+const Districts_1 = require("./Districts");
 const Invite_1 = require("./Invite");
 const Owner_1 = require("./Owner");
+const Provinces_1 = require("./Provinces");
 const RoomImage_1 = require("./RoomImage");
 const RoomRate_1 = require("./RoomRate");
 const UserHistory_1 = require("./UserHistory");
+const Wards_1 = require("./Wards");
 let Room = class Room extends typeorm_1.BaseEntity {
     id;
     rate;
@@ -35,6 +38,9 @@ let Room = class Room extends typeorm_1.BaseEntity {
     parkingFee;
     waterHeating;
     airConditioning;
+    province;
+    district;
+    ward;
     wifi;
     wifiFee;
     lift;
@@ -130,6 +136,24 @@ __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", Boolean)
 ], Room.prototype, "airConditioning", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(_type => Provinces_1.Provinces),
+    (0, typeorm_1.ManyToOne)(() => Provinces_1.Provinces, (province) => province.rooms),
+    (0, typeorm_1.JoinColumn)(),
+    __metadata("design:type", Provinces_1.Provinces)
+], Room.prototype, "province", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(_type => Districts_1.Districts),
+    (0, typeorm_1.ManyToOne)(() => Districts_1.Districts, (district) => district.rooms),
+    (0, typeorm_1.JoinColumn)(),
+    __metadata("design:type", Districts_1.Districts)
+], Room.prototype, "district", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(_type => Wards_1.Wards),
+    (0, typeorm_1.ManyToOne)(() => Wards_1.Wards, (ward) => ward.rooms),
+    (0, typeorm_1.JoinColumn)(),
+    __metadata("design:type", Wards_1.Wards)
+], Room.prototype, "ward", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.Column)(),

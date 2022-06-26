@@ -13,6 +13,7 @@ exports.Districts = void 0;
 const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
 const Provinces_1 = require("./Provinces");
+const Room_1 = require("./Room");
 const Wards_1 = require("./Wards");
 let Districts = class Districts extends typeorm_1.BaseEntity {
     code;
@@ -23,6 +24,7 @@ let Districts = class Districts extends typeorm_1.BaseEntity {
     code_name;
     province_code;
     province;
+    rooms;
     wards;
     administrative_unit_id;
 };
@@ -67,6 +69,11 @@ __decorate([
     (0, typeorm_1.JoinColumn)({ name: "province_code" }),
     __metadata("design:type", Provinces_1.Provinces)
 ], Districts.prototype, "province", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(_type => [Room_1.Room]),
+    (0, typeorm_1.OneToMany)(() => Room_1.Room, (room) => room.district),
+    __metadata("design:type", Array)
+], Districts.prototype, "rooms", void 0);
 __decorate([
     (0, type_graphql_1.Field)(_type => [Wards_1.Wards]),
     (0, typeorm_1.OneToMany)(() => Wards_1.Wards, (ward) => ward.district, { cascade: true }),

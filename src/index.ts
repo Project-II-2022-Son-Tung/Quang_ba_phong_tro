@@ -85,9 +85,10 @@ const main = async () => {
 	const apolloServer = new ApolloServer({
 		schema: await buildSchema({
 		  resolvers: [UserResolver, AdminResolver, OwnerResolver, RoomResolver, ProvincesResolver, DistrictsResolver, WardsResolver], 
-		  validate: false
+		  validate: false,
 		}),
 		context: ({ req, res }): MyContext => ({ req, res, connection: AppDataSource.manager }),
+		introspection: true,
 		plugins: [__prod__ 
 				  ? ApolloServerPluginLandingPageProductionDefault({
 					footer: false,

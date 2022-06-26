@@ -1,6 +1,7 @@
 import { Field, Int, ObjectType } from "type-graphql";
-import { BaseEntity, Column, Entity, JoinColumn, ManyToMany, PrimaryColumn } from "typeorm";
+import { BaseEntity, Column, Entity, JoinColumn, ManyToMany, OneToMany, PrimaryColumn } from "typeorm";
 import { Districts } from "./Districts";
+import { Room } from "./Room";
 
 @ObjectType()
 @Entity()
@@ -33,6 +34,11 @@ export class Wards extends BaseEntity {
     @Field(_type => String)
     @Column({ length: 20})
     district_code: string;
+
+    @Field(_type => [Room])
+    @OneToMany(() => Room, (room) => room.ward)
+    rooms: Room[];
+
 
     @Field(_type => Districts)
     @ManyToMany(() => Districts, (district) => district.wards, { onDelete: "CASCADE" })

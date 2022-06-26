@@ -4,13 +4,13 @@ import { Field, InputType } from "type-graphql";
 export class CreateRoomInput {
 
     @Field()
-    street!: string;
+    ward!: string;
 
     @Field()
     district!: string;
 
     @Field()
-    city!: string;
+    province!: string;
 
     @Field()
     address!: string;

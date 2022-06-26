@@ -1,11 +1,14 @@
 import { Field, ID, ObjectType } from "type-graphql";
-import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Contract } from "./Contract";
+import { Districts } from "./Districts";
 import { Invite } from "./Invite";
 import { Owner } from "./Owner";
+import { Provinces } from "./Provinces";
 import { RoomImage } from "./RoomImage";
 import { RoomRate } from "./RoomRate";
 import { UserHistory } from "./UserHistory";
+import { Wards } from "./Wards";
 
 @ObjectType()
 @Entity()
@@ -74,6 +77,21 @@ export class Room extends BaseEntity {
     @Field()
     @Column()
     airConditioning!: boolean;
+
+    @Field(_type => Provinces)
+    @ManyToOne(() => Provinces, (province) => province.rooms)
+    @JoinColumn()
+    province!: Provinces;
+
+    @Field(_type => Districts)
+    @ManyToOne(() => Districts, (district) => district.rooms)
+    @JoinColumn()
+    district!: Districts;
+
+    @Field(_type => Wards)
+    @ManyToOne(() => Wards, (ward) => ward.rooms)
+    @JoinColumn()
+    ward!: Wards;
 
     @Field()
     @Column()
