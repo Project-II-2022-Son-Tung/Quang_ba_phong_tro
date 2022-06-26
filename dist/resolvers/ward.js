@@ -12,50 +12,36 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RoomResolver = void 0;
-const RoomMutationResponse_1 = require("../types/RoomMutationResponse");
+exports.WardsResolver = void 0;
 const type_graphql_1 = require("type-graphql");
-const Room_1 = require("../entities/Room");
-let RoomResolver = class RoomResolver {
-    async rooms() {
-        return await Room_1.Room.find();
+const Wards_1 = require("../entities/Wards");
+let WardsResolver = class WardsResolver {
+    async wards() {
+        return await Wards_1.Wards.find();
     }
-    async room(id) {
-        const room = await Room_1.Room.findOne({
+    async wardsOfDistrict(districtCode) {
+        return await Wards_1.Wards.find({
             where: {
-                id
+                district_code: districtCode
             }
         });
-        if (!room) {
-            return {
-                code: 400,
-                success: false,
-                message: "Room not found"
-            };
-        }
-        return {
-            code: 200,
-            success: true,
-            room,
-            message: "Successfully found room"
-        };
     }
 };
 __decorate([
-    (0, type_graphql_1.Query)(_return => [Room_1.Room]),
+    (0, type_graphql_1.Query)(_return => [Wards_1.Wards]),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], RoomResolver.prototype, "rooms", null);
+], WardsResolver.prototype, "wards", null);
 __decorate([
-    (0, type_graphql_1.Query)(_return => RoomMutationResponse_1.RoomMutationResponse, { nullable: true }),
-    __param(0, (0, type_graphql_1.Arg)("id")),
+    (0, type_graphql_1.Query)(_return => [Wards_1.Wards]),
+    __param(0, (0, type_graphql_1.Arg)("districtCode")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
-], RoomResolver.prototype, "room", null);
-RoomResolver = __decorate([
-    (0, type_graphql_1.Resolver)(_of => Room_1.Room)
-], RoomResolver);
-exports.RoomResolver = RoomResolver;
-//# sourceMappingURL=room.js.map
+], WardsResolver.prototype, "wardsOfDistrict", null);
+WardsResolver = __decorate([
+    (0, type_graphql_1.Resolver)(_of => Wards_1.Wards)
+], WardsResolver);
+exports.WardsResolver = WardsResolver;
+//# sourceMappingURL=ward.js.map

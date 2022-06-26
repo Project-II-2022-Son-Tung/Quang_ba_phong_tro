@@ -12,50 +12,37 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RoomResolver = void 0;
-const RoomMutationResponse_1 = require("../types/RoomMutationResponse");
+exports.ProvincesResolver = void 0;
+const Districts_1 = require("../entities/Districts");
 const type_graphql_1 = require("type-graphql");
-const Room_1 = require("../entities/Room");
-let RoomResolver = class RoomResolver {
-    async rooms() {
-        return await Room_1.Room.find();
+const Provinces_1 = require("../entities/Provinces");
+let ProvincesResolver = class ProvincesResolver {
+    async provinces() {
+        return await Provinces_1.Provinces.find();
     }
-    async room(id) {
-        const room = await Room_1.Room.findOne({
+    async districts(root) {
+        return await Districts_1.Districts.find({
             where: {
-                id
+                province_code: root.code
             }
         });
-        if (!room) {
-            return {
-                code: 400,
-                success: false,
-                message: "Room not found"
-            };
-        }
-        return {
-            code: 200,
-            success: true,
-            room,
-            message: "Successfully found room"
-        };
     }
 };
 __decorate([
-    (0, type_graphql_1.Query)(_return => [Room_1.Room]),
+    (0, type_graphql_1.Query)(_return => [Provinces_1.Provinces]),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], RoomResolver.prototype, "rooms", null);
+], ProvincesResolver.prototype, "provinces", null);
 __decorate([
-    (0, type_graphql_1.Query)(_return => RoomMutationResponse_1.RoomMutationResponse, { nullable: true }),
-    __param(0, (0, type_graphql_1.Arg)("id")),
+    (0, type_graphql_1.FieldResolver)(_return => [Districts_1.Districts]),
+    __param(0, (0, type_graphql_1.Root)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Provinces_1.Provinces]),
     __metadata("design:returntype", Promise)
-], RoomResolver.prototype, "room", null);
-RoomResolver = __decorate([
-    (0, type_graphql_1.Resolver)(_of => Room_1.Room)
-], RoomResolver);
-exports.RoomResolver = RoomResolver;
-//# sourceMappingURL=room.js.map
+], ProvincesResolver.prototype, "districts", null);
+ProvincesResolver = __decorate([
+    (0, type_graphql_1.Resolver)(_of => Provinces_1.Provinces)
+], ProvincesResolver);
+exports.ProvincesResolver = ProvincesResolver;
+//# sourceMappingURL=province.js.map

@@ -5,11 +5,13 @@ import { DataSource } from "typeorm"
 import { __prod__ } from "./constants";
 import { Admin } from "./entities/Admin";
 import { Contract } from "./entities/Contract";
+import { Districts } from "./entities/Districts";
 import { Identification } from "./entities/Identification";
 import { Invite } from "./entities/Invite";
 import { Owner } from "./entities/Owner";
 import { OwnerHistory } from "./entities/OwnerHistory";
 import { OwnerRate } from "./entities/OwnerRate";
+import { Provinces } from "./entities/Provinces";
 import { RateImage } from "./entities/RateImage";
 import { Room } from "./entities/Room";
 import { RoomImage } from "./entities/RoomImage";
@@ -17,6 +19,7 @@ import { RoomRate } from "./entities/RoomRate";
 import { User } from "./entities/User";
 import { UserHistory } from "./entities/UserHistory";
 import { Wallet } from "./entities/Wallet";
+import { Wards } from "./entities/Wards";
 
 export const AppDataSource = new DataSource({
     type: 'postgres',
@@ -39,7 +42,7 @@ export const AppDataSource = new DataSource({
           ssl: true
         } : {}),
         ...(__prod__ ? {} : {synchronize: true} ),
-        entities: [Admin, User, Owner, UserHistory, RoomRate, RoomImage, Room, RateImage, OwnerRate, OwnerHistory, Invite, Identification, Contract, Wallet],    
+        entities: [Admin, User, Owner, UserHistory, RoomRate, RoomImage, Room, RateImage, OwnerRate, OwnerHistory, Invite, Identification, Contract, Wallet, Provinces, Districts, Wards],    
         migrations: [path.join(__dirname, '/migrations/*')]
 });
 // export const RedisClient = createClient(

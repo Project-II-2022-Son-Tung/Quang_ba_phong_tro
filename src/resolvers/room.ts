@@ -1,3 +1,4 @@
+import { RoomMutationResponse } from "../types/RoomMutationResponse";
 import { Arg, Query, Resolver } from "type-graphql";
 import { Room } from "../entities/Room";
 
@@ -8,14 +9,31 @@ export class RoomResolver {
         return await Room.find();
     }
 
-    @Query(_return => Room, {nullable: true})
-    async room(@Arg("id") id: string): Promise<Room | null> {
-        return await Room.findOne(
+    @Query(_return => RoomMutationResponse, {nullable: true})
+    async room(@Arg("id") id: string): Promise<RoomMutationResponse> {
+        const room = await Room.findOne(
             {
                 where: {
                     id 
                 }
             }
         );
+        if (!room) {
+            return {
+                code: 400,
+                success: false,
+                message: "Room not found"
+            }
+        }
+        return {
+            code: 200,
+            success: true,
+            room,
+            message: "Successfully found room"
+        }
     }
+
+    // @Mutation(_return => RoomMutationResponse)
+    // async createRoom(
+
 }
