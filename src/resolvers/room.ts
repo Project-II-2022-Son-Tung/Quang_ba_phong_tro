@@ -1,6 +1,7 @@
 import { RoomMutationResponse } from "../types/RoomMutationResponse";
-import { Arg, Query, Resolver } from "type-graphql";
+import { Arg, Mutation, Query, Resolver } from "type-graphql";
 import { Room } from "../entities/Room";
+import aws from "aws-sdk";
 
 @Resolver(_of => Room)
 export class RoomResolver {
@@ -35,5 +36,11 @@ export class RoomResolver {
 
     // @Mutation(_return => RoomMutationResponse)
     // async createRoom(
+
+    @Mutation(_return => String)
+    async uploadImage(): Promise<String> {
+        return "";
+    }
+
 
 }

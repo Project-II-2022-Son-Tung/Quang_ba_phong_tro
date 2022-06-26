@@ -89,6 +89,7 @@ const main = async () => {
 		}),
 		context: ({ req, res }): MyContext => ({ req, res, connection: AppDataSource.manager }),
 		introspection: true,
+		csrfPrevention: true,
 		plugins: [__prod__ 
 				  ? ApolloServerPluginLandingPageProductionDefault({
 					footer: false,
@@ -100,6 +101,10 @@ const main = async () => {
 	apolloServer.applyMiddleware({app, cors: false});
   	const PORT = process.env.PORT || 5000;
   
+	app.post('/auth', (req, res) => {
+		console.log(req.body);
+		res.send('Hello World!');
+	});
   	app.listen(PORT, () => {
     	console.log(`Server started on port ${PORT}. GraphQL server started on localhost:${PORT}${apolloServer.graphqlPath}`);
   	});

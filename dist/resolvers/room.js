@@ -40,6 +40,9 @@ let RoomResolver = class RoomResolver {
             message: "Successfully found room"
         };
     }
+    async uploadImage() {
+        return "";
+    }
 };
 __decorate([
     (0, type_graphql_1.Query)(_return => [Room_1.Room]),
@@ -54,6 +57,12 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], RoomResolver.prototype, "room", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(_return => String),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], RoomResolver.prototype, "uploadImage", null);
 RoomResolver = __decorate([
     (0, type_graphql_1.Resolver)(_of => Room_1.Room)
 ], RoomResolver);
