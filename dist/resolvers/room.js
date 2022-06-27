@@ -132,12 +132,12 @@ let RoomResolver = class RoomResolver {
                 });
                 await transactionEntityManager.save(room);
                 roomInput.images.forEach(async (image) => {
-                    transactionEntityManager.create(RoomImage_1.RoomImage, {
+                    const newImage = transactionEntityManager.create(RoomImage_1.RoomImage, {
                         imageUrl: image.fileUrl,
                         caption: image.caption,
                         room
                     });
-                    await transactionEntityManager.save(room);
+                    await transactionEntityManager.save(newImage);
                 });
                 return {
                     code: 200,
