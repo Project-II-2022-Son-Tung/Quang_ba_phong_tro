@@ -24,6 +24,10 @@ export class Room extends BaseEntity {
 
     @Field()
     @Column()
+    title: string;
+
+    @Field()
+    @Column()
     address!: string;
 
     @Field()
@@ -54,21 +58,21 @@ export class Room extends BaseEntity {
     @Column()
     petsAllowed!: boolean;
 
-    @Field()
-    @Column()
-    electricPrice!: number;
+    @Field({nullable: true})
+    @Column({nullable: true})
+    electricPrice?: number;
 
-    @Field()
-    @Column()
-    waterPrice!: number;
+    @Field({nullable: true})
+    @Column({nullable: true})
+    waterPrice?: number;
 
     @Field()
     @Column()
     parking!: boolean;
 
-    @Field()
-    @Column()
-    parkingFee!: number;
+    @Field({nullable: true})
+    @Column({nullable: true})
+    parkingFee?: number;
 
     @Field()
     @Column()
@@ -97,9 +101,9 @@ export class Room extends BaseEntity {
     @Column()
     wifi!: boolean;
 
-    @Field()
-    @Column()
-    wifiFee!: number;
+    @Field({nullable: true})
+    @Column({nullable: true})
+    wifiFee?: number;
 
     @Field()
     @Column()

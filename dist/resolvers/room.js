@@ -16,6 +16,12 @@ exports.RoomResolver = void 0;
 const RoomMutationResponse_1 = require("../types/RoomMutationResponse");
 const type_graphql_1 = require("type-graphql");
 const Room_1 = require("../entities/Room");
+const CreateRoomInput_1 = require("../types/CreateRoomInput");
+const Wards_1 = require("../entities/Wards");
+const Districts_1 = require("../entities/Districts");
+const Provinces_1 = require("../entities/Provinces");
+const RoomImage_1 = require("../entities/RoomImage");
+const Owner_1 = require("../entities/Owner");
 let RoomResolver = class RoomResolver {
     async rooms() {
         return await Room_1.Room.find();
@@ -40,8 +46,114 @@ let RoomResolver = class RoomResolver {
             message: "Successfully found room"
         };
     }
-    async uploadImage() {
-        return "";
+    async createRoom(roomInput, myContext) {
+        if (myContext.req.session.role !== "owner") {
+            return {
+                code: 400,
+                success: false,
+                message: "You are not authorized to create room"
+            };
+        }
+        const owner = await Owner_1.Owner.findOne({
+            where: {
+                id: myContext.req.session.userId
+            }
+        });
+        if (!owner) {
+            return {
+                code: 400,
+                success: false,
+                message: "Your owner identification is not found"
+            };
+        }
+        const connection = myContext.connection;
+        return await connection.transaction(async (transactionEntityManager) => {
+            try {
+                const ward = await transactionEntityManager.findOne(Wards_1.Wards, {
+                    where: {
+                        code: roomInput.ward
+                    }
+                });
+                if (!ward) {
+                    return {
+                        code: 400,
+                        success: false,
+                        message: "Ward not valid",
+                        errors: [
+                            {
+                                field: "ward",
+                                message: "Ward not valid"
+                            }
+                        ]
+                    };
+                }
+                const district = await transactionEntityManager.findOne(Districts_1.Districts, {
+                    where: {
+                        code: roomInput.district
+                    }
+                });
+                if ((!district) || (district.code !== ward.district_code)) {
+                    return {
+                        code: 400,
+                        success: false,
+                        message: "District not valid",
+                        errors: [
+                            {
+                                field: "district",
+                                message: "District not valid"
+                            }
+                        ]
+                    };
+                }
+                const province = await transactionEntityManager.findOne(Provinces_1.Provinces, {
+                    where: {
+                        code: roomInput.province
+                    }
+                });
+                if ((!province) || (province.code !== district.province_code)) {
+                    return {
+                        code: 400,
+                        success: false,
+                        message: "Province not valid",
+                        errors: [
+                            {
+                                field: "province",
+                                message: "Province not valid"
+                            }
+                        ]
+                    };
+                }
+                const room = transactionEntityManager.create(Room_1.Room, {
+                    ...roomInput,
+                    owner,
+                    ward,
+                    district,
+                    province,
+                });
+                await transactionEntityManager.save(room);
+                roomInput.images.forEach(async (image) => {
+                    transactionEntityManager.create(RoomImage_1.RoomImage, {
+                        imageUrl: image.fileUrl,
+                        caption: image.caption,
+                        room
+                    });
+                    await transactionEntityManager.save(room);
+                });
+                return {
+                    code: 200,
+                    success: true,
+                    message: "Successfully created room",
+                    room
+                };
+            }
+            catch (error) {
+                return {
+                    code: 500,
+                    success: false,
+                    message: `Error creating room: ${error}`
+                };
+            }
+        });
     }
 };
 __decorate([
@@ -58,11 +170,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], RoomResolver.prototype, "room", null);
 __decorate([
-    (0, type_graphql_1.Mutation)(_return => String),
+    (0, type_graphql_1.Mutation)(_return => RoomMutationResponse_1.RoomMutationResponse),
+    __param(0, (0, type_graphql_1.Arg)("roomInput")),
+    __param(1, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [CreateRoomInput_1.CreateRoomInput, Object]),
     __metadata("design:returntype", Promise)
-], RoomResolver.prototype, "uploadImage", null);
+], RoomResolver.prototype, "createRoom", null);
 RoomResolver = __decorate([
     (0, type_graphql_1.Resolver)(_of => Room_1.Room)
 ], RoomResolver);

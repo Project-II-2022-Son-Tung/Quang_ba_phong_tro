@@ -1,7 +1,13 @@
 import { RoomMutationResponse } from "../types/RoomMutationResponse";
-import { Arg, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { Room } from "../entities/Room";
-import aws from "aws-sdk";
+import { CreateRoomInput } from "../types/CreateRoomInput";
+import { MyContext } from "../types/MyContext";
+import { Wards } from "../entities/Wards";
+import { Districts } from "../entities/Districts";
+import { Provinces } from "../entities/Provinces";
+import { RoomImage } from "../entities/RoomImage";
+import { Owner } from "../entities/Owner";
 
 @Resolver(_of => Room)
 export class RoomResolver {
@@ -34,13 +40,130 @@ export class RoomResolver {
         }
     }
 
-    // @Mutation(_return => RoomMutationResponse)
-    // async createRoom(
+    @Mutation(_return => RoomMutationResponse)
+    async createRoom(
+        @Arg("roomInput") roomInput: CreateRoomInput,
+        @Ctx() myContext: MyContext
+    ): Promise<RoomMutationResponse> {
+        if(myContext.req.session.role !== "owner") {
+            return {
+                code: 400,
+                success: false,
+                message: "You are not authorized to create room"
+            }
+        }
+        const owner = await Owner.findOne(
+            {
+                where: {
+                    id: myContext.req.session!.userId
+                }
+            }
+        );
+        if (!owner) {
+            return {
+                code: 400,
+                success: false,
+                message: "Your owner identification is not found"
+            }
+        }
+        const connection = myContext.connection;
+        return await connection.transaction(async transactionEntityManager =>{
+            try {
+                const ward = await transactionEntityManager.findOne(Wards, {
+                    where: {
+                        code: roomInput.ward
+                    }
+                });
+                if (!ward) {
+                    return {
+                        code: 400,
+                        success: false,
+                        message: "Ward not valid",
+                        errors: [
+                            {
+                                field: "ward",
+                                message: "Ward not valid"
+                            }
+                        ]
+                    }
+                }
+                const district = await transactionEntityManager.findOne(Districts, {
+                    where: {
+                        code: roomInput.district
+                    }
+                });
 
-    @Mutation(_return => String)
-    async uploadImage(): Promise<String> {
-        return "";
+                if ((!district) || (district.code !== ward.district_code)) {
+                    return {
+                        code: 400,
+                        success: false,
+                        message: "District not valid",
+                        errors: [
+                            {
+                                field: "district",
+                                message: "District not valid"
+                            }
+                        ]
+                    }
+                }
+
+                const province = await transactionEntityManager.findOne(Provinces, {
+                    where: {
+                        code: roomInput.province
+                    }
+                });
+
+
+                if ((!province) || (province.code !== district.province_code)) {
+                    return {
+                        code: 400,
+                        success: false,
+                        message: "Province not valid",
+                        errors: [
+                            {
+                                field: "province",
+                                message: "Province not valid"
+                            }
+                        ]
+                        
+                    }
+                }
+
+                const room = transactionEntityManager.create(Room, {
+                    ...roomInput,
+                    owner,
+                    ward,
+                    district,
+                    province,
+                });
+                await transactionEntityManager.save(room);
+
+                roomInput.images.forEach(async image => {
+                    transactionEntityManager.create(RoomImage, {
+                        imageUrl: image.fileUrl,
+                        caption: image.caption,
+                        room
+                    });
+                    await transactionEntityManager.save(room);
+                });
+
+                
+                return {
+                    code: 200,
+                    success: true,
+                    message: "Successfully created room",
+                    room
+                }
+            } catch (error) {
+                return {
+                    code: 500,
+                    success: false,
+                    message: `Error creating room: ${error}`
+                }
+            }
+        });
     }
+
 
 
 }
