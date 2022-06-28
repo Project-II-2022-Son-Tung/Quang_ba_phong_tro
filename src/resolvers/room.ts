@@ -8,6 +8,10 @@ import { Districts } from "../entities/Districts";
 import { Provinces } from "../entities/Provinces";
 import { RoomImage } from "../entities/RoomImage";
 import { Owner } from "../entities/Owner";
+import { RoomOrderByInput } from "../types/RoomOrderByInput";
+import { Between, FindOptionsWhere, In, Like } from "typeorm";
+import { FilterRange} from "../types/RoomFilterInput";
+import { RoomFilterInput } from "../types/RoomFilterInput";
 
 @Resolver(_of => Room)
 export class RoomResolver {
@@ -22,8 +26,63 @@ export class RoomResolver {
 
 
     @Query(_return => [Room])
-    async rooms(): Promise<Room[]> {
-        return await Room.find();
+    async rooms(
+        @Arg("page") page: number,
+        @Arg("limit") limit: number,
+        @Arg("orderBy", {nullable: true}) orderBy?: RoomOrderByInput,
+        @Arg("filter", {nullable: true}) filter?: RoomFilterInput,
+    ): Promise<Room[]> {
+        const realLimit = Math.min(limit, 20);
+        let whereFilter: FindOptionsWhere<Room> | FindOptionsWhere<Room>[] = {};
+        if (filter) {
+            let key: keyof RoomFilterInput;
+            for (key in filter) {
+                if (filter[key] instanceof FilterRange) {
+                    const range: FilterRange = filter[key] as FilterRange;
+                    whereFilter = {
+                        ...whereFilter,
+                        [key]: Between(range.min, range.max)
+                    }
+                }
+                else if (filter[key] instanceof Array) {
+                    whereFilter = {
+                        ...whereFilter,
+                        [key]: In(filter[key] as string[])
+                    }
+                }
+                else if (typeof filter[key] === "boolean") {
+                    whereFilter = {
+                        ...whereFilter,
+                        [key]: filter[key] as Boolean
+                    }
+                }
+            }
+            if (filter.search && filter.search.length > 0) {
+                whereFilter = [{
+                    ...whereFilter,
+                    title: Like(`%${filter.search}%`)
+                },
+                {
+                    ...whereFilter,
+                    address: Like(`%${filter.search}%`)
+                },
+                {
+                    ...whereFilter,
+                    description: Like(`%${filter.search}%`)
+                }]
+            }
+        }
+        console.log(whereFilter);
+        const rooms = await Room.find({
+            where: whereFilter,
+            skip: (page - 1) * realLimit,
+            take: realLimit,
+            relations: ["owner", "ward", "district", "province"],
+            order: orderBy ? orderBy : {
+                 createdAt: "DESC"
+            }
+        });
+        return rooms;
     }
 
     @Query(_return => RoomMutationResponse, {nullable: true})

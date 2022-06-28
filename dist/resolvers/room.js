@@ -22,6 +22,10 @@ const Districts_1 = require("../entities/Districts");
 const Provinces_1 = require("../entities/Provinces");
 const RoomImage_1 = require("../entities/RoomImage");
 const Owner_1 = require("../entities/Owner");
+const RoomOrderByInput_1 = require("../types/RoomOrderByInput");
+const typeorm_1 = require("typeorm");
+const RoomFilterInput_1 = require("../types/RoomFilterInput");
+const RoomFilterInput_2 = require("../types/RoomFilterInput");
 let RoomResolver = class RoomResolver {
     async images(room) {
         return await RoomImage_1.RoomImage.find({
@@ -30,8 +34,58 @@ let RoomResolver = class RoomResolver {
             }
         });
     }
-    async rooms() {
-        return await Room_1.Room.find();
+    async rooms(page, limit, orderBy, filter) {
+        const realLimit = Math.min(limit, 20);
+        let whereFilter = {};
+        if (filter) {
+            let key;
+            for (key in filter) {
+                if (filter[key] instanceof RoomFilterInput_1.FilterRange) {
+                    const range = filter[key];
+                    whereFilter = {
+                        ...whereFilter,
+                        [key]: (0, typeorm_1.Between)(range.min, range.max)
+                    };
+                }
+                else if (filter[key] instanceof Array) {
+                    whereFilter = {
+                        ...whereFilter,
+                        [key]: (0, typeorm_1.In)(filter[key])
+                    };
+                }
+                else if (typeof filter[key] === "boolean") {
+                    whereFilter = {
+                        ...whereFilter,
+                        [key]: filter[key]
+                    };
+                }
+            }
+            if (filter.search && filter.search.length > 0) {
+                whereFilter = [{
+                        ...whereFilter,
+                        title: (0, typeorm_1.Like)(`%${filter.search}%`)
+                    },
+                    {
+                        ...whereFilter,
+                        address: (0, typeorm_1.Like)(`%${filter.search}%`)
+                    },
+                    {
+                        ...whereFilter,
+                        description: (0, typeorm_1.Like)(`%${filter.search}%`)
+                    }];
+            }
+        }
+        console.log(whereFilter);
+        const rooms = await Room_1.Room.find({
+            where: whereFilter,
+            skip: (page - 1) * realLimit,
+            take: realLimit,
+            relations: ["owner", "ward", "district", "province"],
+            order: orderBy ? orderBy : {
+                createdAt: "DESC"
+            }
+        });
+        return rooms;
     }
     async room(id) {
         const room = await Room_1.Room.findOne({
@@ -172,8 +226,13 @@ __decorate([
 ], RoomResolver.prototype, "images", null);
 __decorate([
     (0, type_graphql_1.Query)(_return => [Room_1.Room]),
+    __param(0, (0, type_graphql_1.Arg)("page")),
+    __param(1, (0, type_graphql_1.Arg)("limit")),
+    __param(2, (0, type_graphql_1.Arg)("orderBy", { nullable: true })),
+    __param(3, (0, type_graphql_1.Arg)("filter", { nullable: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Number, Number, RoomOrderByInput_1.RoomOrderByInput,
+        RoomFilterInput_2.RoomFilterInput]),
     __metadata("design:returntype", Promise)
 ], RoomResolver.prototype, "rooms", null);
 __decorate([

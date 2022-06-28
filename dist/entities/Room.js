@@ -40,8 +40,11 @@ let Room = class Room extends typeorm_1.BaseEntity {
     waterHeating;
     airConditioning;
     province;
+    provinceCode;
     district;
+    districtCode;
     ward;
+    wardCode;
     wifi;
     wifiFee;
     lift;
@@ -145,21 +148,33 @@ __decorate([
 __decorate([
     (0, type_graphql_1.Field)(_type => Provinces_1.Provinces),
     (0, typeorm_1.ManyToOne)(() => Provinces_1.Provinces, (province) => province.rooms),
-    (0, typeorm_1.JoinColumn)(),
+    (0, typeorm_1.JoinColumn)({ name: "provinceCode" }),
     __metadata("design:type", Provinces_1.Provinces)
 ], Room.prototype, "province", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Room.prototype, "provinceCode", void 0);
+__decorate([
     (0, type_graphql_1.Field)(_type => Districts_1.Districts),
     (0, typeorm_1.ManyToOne)(() => Districts_1.Districts, (district) => district.rooms),
-    (0, typeorm_1.JoinColumn)(),
+    (0, typeorm_1.JoinColumn)({ name: "districtCode" }),
     __metadata("design:type", Districts_1.Districts)
 ], Room.prototype, "district", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Room.prototype, "districtCode", void 0);
+__decorate([
     (0, type_graphql_1.Field)(_type => Wards_1.Wards),
     (0, typeorm_1.ManyToOne)(() => Wards_1.Wards, (ward) => ward.rooms),
-    (0, typeorm_1.JoinColumn)(),
+    (0, typeorm_1.JoinColumn)({ name: "wardCode" }),
     __metadata("design:type", Wards_1.Wards)
 ], Room.prototype, "ward", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Room.prototype, "wardCode", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.Column)(),
@@ -181,10 +196,12 @@ __decorate([
     __metadata("design:type", Number)
 ], Room.prototype, "numberOfFloors", void 0);
 __decorate([
+    (0, type_graphql_1.Field)(),
     (0, typeorm_1.Column)({ default: true }),
     __metadata("design:type", Boolean)
 ], Room.prototype, "available", void 0);
 __decorate([
+    (0, type_graphql_1.Field)(),
     (0, typeorm_1.Column)(),
     __metadata("design:type", Number)
 ], Room.prototype, "price", void 0);
@@ -219,6 +236,7 @@ __decorate([
     __metadata("design:type", Array)
 ], Room.prototype, "contracts", void 0);
 __decorate([
+    (0, type_graphql_1.Field)(),
     (0, typeorm_1.CreateDateColumn)({ type: "timestamptz" }),
     __metadata("design:type", Date)
 ], Room.prototype, "createdAt", void 0);

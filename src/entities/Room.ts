@@ -84,18 +84,27 @@ export class Room extends BaseEntity {
 
     @Field(_type => Provinces)
     @ManyToOne(() => Provinces, (province) => province.rooms)
-    @JoinColumn()
+    @JoinColumn({ name: "provinceCode" })
     province!: Provinces;
+
+    @Column({nullable: true})
+    provinceCode: string;
 
     @Field(_type => Districts)
     @ManyToOne(() => Districts, (district) => district.rooms)
-    @JoinColumn()
+    @JoinColumn({ name: "districtCode" })
     district!: Districts;
+
+    @Column({nullable: true})
+    districtCode: string;
 
     @Field(_type => Wards)
     @ManyToOne(() => Wards, (ward) => ward.rooms)
-    @JoinColumn()
+    @JoinColumn({ name: "wardCode" })
     ward!: Wards;
+
+    @Column({nullable: true})
+    wardCode: string;
 
     @Field()
     @Column()
@@ -113,9 +122,11 @@ export class Room extends BaseEntity {
     @Column()
     numberOfFloors!: number;
 
+    @Field()
     @Column({default: true})
     available!: boolean;
 
+    @Field()
     @Column()
     price !: number;
     
@@ -143,6 +154,7 @@ export class Room extends BaseEntity {
     @OneToMany(() => Contract, (contract) => contract.room)
     contracts: Contract[];
 
+    @Field()
     @CreateDateColumn({ type: "timestamptz" })
     createdAt!: Date;
 
