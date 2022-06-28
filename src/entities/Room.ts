@@ -18,7 +18,7 @@ export class Room extends BaseEntity {
     @PrimaryGeneratedColumn("uuid")
     id!: string;
 
-    @Field()
+    @Field({nullable: true})
     @Column({nullable: true})
     rate: number;
 
