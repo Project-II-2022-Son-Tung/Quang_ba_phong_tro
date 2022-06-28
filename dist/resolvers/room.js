@@ -23,6 +23,13 @@ const Provinces_1 = require("../entities/Provinces");
 const RoomImage_1 = require("../entities/RoomImage");
 const Owner_1 = require("../entities/Owner");
 let RoomResolver = class RoomResolver {
+    async images(room) {
+        return await RoomImage_1.RoomImage.find({
+            where: {
+                roomId: room.id
+            }
+        });
+    }
     async rooms() {
         return await Room_1.Room.find();
     }
@@ -156,6 +163,13 @@ let RoomResolver = class RoomResolver {
         });
     }
 };
+__decorate([
+    (0, type_graphql_1.FieldResolver)(_type => [RoomImage_1.RoomImage]),
+    __param(0, (0, type_graphql_1.Root)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Room_1.Room]),
+    __metadata("design:returntype", Promise)
+], RoomResolver.prototype, "images", null);
 __decorate([
     (0, type_graphql_1.Query)(_return => [Room_1.Room]),
     __metadata("design:type", Function),

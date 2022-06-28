@@ -1,5 +1,5 @@
 import { RoomMutationResponse } from "../types/RoomMutationResponse";
-import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from "type-graphql";
 import { Room } from "../entities/Room";
 import { CreateRoomInput } from "../types/CreateRoomInput";
 import { MyContext } from "../types/MyContext";
@@ -11,6 +11,16 @@ import { Owner } from "../entities/Owner";
 
 @Resolver(_of => Room)
 export class RoomResolver {
+    @FieldResolver(_type => [RoomImage])
+    async images(@Root() room: Room): Promise<RoomImage[]> {
+        return await RoomImage.find({
+            where: {
+                roomId : room.id
+            }
+        });
+    }
+
+
     @Query(_return => [Room])
     async rooms(): Promise<Room[]> {
         return await Room.find();

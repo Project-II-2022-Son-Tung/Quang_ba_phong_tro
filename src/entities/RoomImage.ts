@@ -11,8 +11,12 @@ export class RoomImage extends BaseEntity{
 
     @Field(_type => Room)
     @ManyToOne(() => Room, (room) => room.images, { onDelete: "CASCADE" })
-    @JoinColumn()
+    @JoinColumn({ name: "roomId" })
     room!: Room;
+
+    @Field()
+    @Column()
+    roomId: string;
 
     @Field()
     @Column()

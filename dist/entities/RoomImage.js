@@ -16,6 +16,7 @@ const Room_1 = require("./Room");
 let RoomImage = class RoomImage extends typeorm_1.BaseEntity {
     id;
     room;
+    roomId;
     imageUrl;
     caption;
     createdAt;
@@ -29,9 +30,14 @@ __decorate([
 __decorate([
     (0, type_graphql_1.Field)(_type => Room_1.Room),
     (0, typeorm_1.ManyToOne)(() => Room_1.Room, (room) => room.images, { onDelete: "CASCADE" }),
-    (0, typeorm_1.JoinColumn)(),
+    (0, typeorm_1.JoinColumn)({ name: "roomId" }),
     __metadata("design:type", Room_1.Room)
 ], RoomImage.prototype, "room", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], RoomImage.prototype, "roomId", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.Column)(),
