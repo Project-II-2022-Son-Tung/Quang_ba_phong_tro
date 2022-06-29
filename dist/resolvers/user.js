@@ -32,6 +32,7 @@ const UserRegisterInput_1 = require("../types/UserRegisterInput");
 const Wallet_1 = require("../entities/Wallet");
 const Identification_1 = require("../entities/Identification");
 const UpdateUIInput_1 = require("../types/UpdateUIInput");
+const RoomFavourite_1 = require("../entities/RoomFavourite");
 let UserResolver = class UserResolver {
     async me(ctx) {
         if ((!ctx.req.session.userId) || ctx.req.session.role !== 'user') {
@@ -44,6 +45,14 @@ let UserResolver = class UserResolver {
             relations: ["identification", "wallet"],
         });
         return user;
+    }
+    async roomFavourites(user) {
+        return await RoomFavourite_1.RoomFavourite.find({
+            where: {
+                userId: user.id
+            },
+            relations: ["room"]
+        });
     }
     async register(registerInput, myContext) {
         const connection = myContext.connection;
@@ -363,6 +372,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "me", null);
+__decorate([
+    (0, type_graphql_1.FieldResolver)(_return => [RoomFavourite_1.RoomFavourite]),
+    __param(0, (0, type_graphql_1.Root)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [User_1.User]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "roomFavourites", null);
 __decorate([
     (0, type_graphql_1.Mutation)(_return => UserMutationResponse_1.UserMutationResponse),
     __param(0, (0, type_graphql_1.Arg)("registerInput")),

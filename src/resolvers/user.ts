@@ -1,5 +1,5 @@
 import { User } from "../entities/User";
-import { Arg,  Ctx,  Mutation, Query, Resolver } from "type-graphql";
+import { Arg,  Ctx,  FieldResolver,  Mutation, Query, Resolver, Root } from "type-graphql";
 import argon2 from "argon2";
 import { UserMutationResponse } from "../types/UserMutationResponse";
 import { validateRegisterInput } from "../utils/validateRegisterInput";
@@ -15,6 +15,7 @@ import { UserRegisterInput } from "../types/UserRegisterInput";
 import { Wallet } from "../entities/Wallet";
 import { Identification } from "../entities/Identification";
 import { UpdateUIInput } from "../types/UpdateUIInput";
+import { RoomFavourite } from "../entities/RoomFavourite";
 
 @Resolver(_of => User)
 export class UserResolver {
@@ -35,6 +36,20 @@ export class UserResolver {
         return user;
 
     }
+
+    @FieldResolver(_return => [RoomFavourite])
+    async roomFavourites(
+        @Root() user: User,
+    ) : Promise<RoomFavourite[]> {
+        return await RoomFavourite.find({
+            where: {
+                userId: user.id
+            },
+            relations: ["room"]
+        });
+    }
+        
+        
 
 
     @Mutation(_return => UserMutationResponse)

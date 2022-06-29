@@ -14,6 +14,7 @@ import { OwnerRate } from "./entities/OwnerRate";
 import { Provinces } from "./entities/Provinces";
 import { RateImage } from "./entities/RateImage";
 import { Room } from "./entities/Room";
+import { RoomFavourite } from "./entities/RoomFavourite";
 import { RoomImage } from "./entities/RoomImage";
 import { RoomRate } from "./entities/RoomRate";
 import { User } from "./entities/User";
@@ -42,7 +43,7 @@ export const AppDataSource = new DataSource({
           ssl: true
         } : {}),
         ...(__prod__ ? {} : {synchronize: true} ),
-        entities: [Admin, User, Owner, UserHistory, RoomRate, RoomImage, Room, RateImage, OwnerRate, OwnerHistory, Invite, Identification, Contract, Wallet, Provinces, Districts, Wards],    
+        entities: [Admin, User, Owner, UserHistory, RoomRate, RoomImage, Room, RateImage, OwnerRate, OwnerHistory, Invite, Identification, Contract, Wallet, Provinces, Districts, Wards, RoomFavourite],    
         migrations: [path.join(__dirname, '/migrations/*')]
 });
 // export const RedisClient = createClient(

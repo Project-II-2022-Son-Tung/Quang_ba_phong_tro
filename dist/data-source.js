@@ -19,6 +19,7 @@ const OwnerRate_1 = require("./entities/OwnerRate");
 const Provinces_1 = require("./entities/Provinces");
 const RateImage_1 = require("./entities/RateImage");
 const Room_1 = require("./entities/Room");
+const RoomFavourite_1 = require("./entities/RoomFavourite");
 const RoomImage_1 = require("./entities/RoomImage");
 const RoomRate_1 = require("./entities/RoomRate");
 const User_1 = require("./entities/User");
@@ -46,7 +47,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
         ssl: true
     } : {}),
     ...(constants_1.__prod__ ? {} : { synchronize: true }),
-    entities: [Admin_1.Admin, User_1.User, Owner_1.Owner, UserHistory_1.UserHistory, RoomRate_1.RoomRate, RoomImage_1.RoomImage, Room_1.Room, RateImage_1.RateImage, OwnerRate_1.OwnerRate, OwnerHistory_1.OwnerHistory, Invite_1.Invite, Identification_1.Identification, Contract_1.Contract, Wallet_1.Wallet, Provinces_1.Provinces, Districts_1.Districts, Wards_1.Wards],
+    entities: [Admin_1.Admin, User_1.User, Owner_1.Owner, UserHistory_1.UserHistory, RoomRate_1.RoomRate, RoomImage_1.RoomImage, Room_1.Room, RateImage_1.RateImage, OwnerRate_1.OwnerRate, OwnerHistory_1.OwnerHistory, Invite_1.Invite, Identification_1.Identification, Contract_1.Contract, Wallet_1.Wallet, Provinces_1.Provinces, Districts_1.Districts, Wards_1.Wards, RoomFavourite_1.RoomFavourite],
     migrations: [path_1.default.join(__dirname, '/migrations/*')]
 });
 //# sourceMappingURL=data-source.js.map

@@ -20,6 +20,7 @@ const room_1 = require("./resolvers/room");
 const province_1 = require("./resolvers/province");
 const district_1 = require("./resolvers/district");
 const ward_1 = require("./resolvers/ward");
+const roomFavourite_1 = require("./resolvers/roomFavourite");
 const main = async () => {
     await data_source_1.AppDataSource.initialize();
     console.log("Initialized data source");
@@ -65,7 +66,7 @@ const main = async () => {
     }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: await (0, type_graphql_1.buildSchema)({
-            resolvers: [user_1.UserResolver, admin_1.AdminResolver, owner_1.OwnerResolver, room_1.RoomResolver, province_1.ProvincesResolver, district_1.DistrictsResolver, ward_1.WardsResolver],
+            resolvers: [user_1.UserResolver, admin_1.AdminResolver, owner_1.OwnerResolver, room_1.RoomResolver, province_1.ProvincesResolver, district_1.DistrictsResolver, ward_1.WardsResolver, roomFavourite_1.RoomFavouriteResolver],
             validate: false,
         }),
         context: ({ req, res }) => ({ req, res, connection: data_source_1.AppDataSource.manager }),

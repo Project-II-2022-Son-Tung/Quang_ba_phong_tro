@@ -6,6 +6,7 @@ import {Identification} from "./Identification";
 import { UserHistory } from "./UserHistory";
 import { Invite } from "./Invite";
 import { Wallet } from "./Wallet";
+import { RoomFavourite } from "./RoomFavourite";
 
 @ObjectType()
 @Entity()
@@ -67,6 +68,10 @@ export class User extends BaseEntity {
     @Field(_type => [Invite], {nullable: true})
     @OneToMany(() => Invite, (invite) => invite.user)
     invites: Invite[];
+
+    @Field(_type => [RoomFavourite], {nullable: true})
+    @OneToMany(() => RoomFavourite, (favourite) => favourite.user)
+    roomFavourites: RoomFavourite[];
     
     @Field(_type => [UserHistory], {nullable: true})
     @OneToMany(() => UserHistory, (history) => history.user)

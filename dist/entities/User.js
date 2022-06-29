@@ -18,6 +18,7 @@ const Identification_1 = require("./Identification");
 const UserHistory_1 = require("./UserHistory");
 const Invite_1 = require("./Invite");
 const Wallet_1 = require("./Wallet");
+const RoomFavourite_1 = require("./RoomFavourite");
 let User = class User extends typeorm_1.BaseEntity {
     id;
     username;
@@ -33,6 +34,7 @@ let User = class User extends typeorm_1.BaseEntity {
     rates;
     contracts;
     invites;
+    roomFavourites;
     histories;
     createdAt;
     updatedAt;
@@ -108,6 +110,11 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => Invite_1.Invite, (invite) => invite.user),
     __metadata("design:type", Array)
 ], User.prototype, "invites", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(_type => [RoomFavourite_1.RoomFavourite], { nullable: true }),
+    (0, typeorm_1.OneToMany)(() => RoomFavourite_1.RoomFavourite, (favourite) => favourite.user),
+    __metadata("design:type", Array)
+], User.prototype, "roomFavourites", void 0);
 __decorate([
     (0, type_graphql_1.Field)(_type => [UserHistory_1.UserHistory], { nullable: true }),
     (0, typeorm_1.OneToMany)(() => UserHistory_1.UserHistory, (history) => history.user),

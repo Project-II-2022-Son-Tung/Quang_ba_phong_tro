@@ -17,6 +17,7 @@ import { RoomResolver } from "./resolvers/room";
 import { ProvincesResolver } from "./resolvers/province";
 import { DistrictsResolver } from "./resolvers/district";
 import { WardsResolver } from "./resolvers/ward";
+import { RoomFavouriteResolver } from "./resolvers/roomFavourite";
 
 
 const main = async () => {
@@ -84,7 +85,7 @@ const main = async () => {
 	
 	const apolloServer = new ApolloServer({
 		schema: await buildSchema({
-		  resolvers: [UserResolver, AdminResolver, OwnerResolver, RoomResolver, ProvincesResolver, DistrictsResolver, WardsResolver], 
+		  resolvers: [UserResolver, AdminResolver, OwnerResolver, RoomResolver, ProvincesResolver, DistrictsResolver, WardsResolver, RoomFavouriteResolver], 
 		  validate: false,
 		}),
 		context: ({ req, res }): MyContext => ({ req, res, connection: AppDataSource.manager }),
