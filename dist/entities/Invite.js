@@ -9,17 +9,26 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Invite = void 0;
+exports.Invite = exports.iStatus = void 0;
 const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
 const Owner_1 = require("./Owner");
 const Room_1 = require("./Room");
 const User_1 = require("./User");
+var iStatus;
+(function (iStatus) {
+    iStatus["PENDING"] = "PENDING";
+    iStatus["ACCEPTED"] = "ACCEPTED";
+    iStatus["REJECTED"] = "REJECTED";
+})(iStatus = exports.iStatus || (exports.iStatus = {}));
 let Invite = class Invite extends typeorm_1.BaseEntity {
     id;
     owner;
+    ownerId;
     user;
+    userId;
     room;
+    roomId;
     timeOfCheck;
     status;
     createdAt;
@@ -32,29 +41,48 @@ __decorate([
 __decorate([
     (0, type_graphql_1.Field)(_type => Owner_1.Owner),
     (0, typeorm_1.ManyToOne)(() => Owner_1.Owner, (owner) => owner.invites),
-    (0, typeorm_1.JoinColumn)(),
+    (0, typeorm_1.JoinColumn)({ name: "ownerId" }),
     __metadata("design:type", Owner_1.Owner)
 ], Invite.prototype, "owner", void 0);
 __decorate([
+    (0, type_graphql_1.Field)(),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Invite.prototype, "ownerId", void 0);
+__decorate([
     (0, type_graphql_1.Field)(_type => User_1.User),
     (0, typeorm_1.ManyToOne)(() => User_1.User, (user) => user.invites),
-    (0, typeorm_1.JoinColumn)(),
+    (0, typeorm_1.JoinColumn)({ name: "userId" }),
     __metadata("design:type", User_1.User)
 ], Invite.prototype, "user", void 0);
 __decorate([
+    (0, type_graphql_1.Field)(),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Invite.prototype, "userId", void 0);
+__decorate([
     (0, type_graphql_1.Field)(_type => Room_1.Room),
     (0, typeorm_1.ManyToOne)(() => Room_1.Room, (room) => room.invites),
-    (0, typeorm_1.JoinColumn)(),
+    (0, typeorm_1.JoinColumn)({ name: "roomId" }),
     __metadata("design:type", Room_1.Room)
 ], Invite.prototype, "room", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
     (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Invite.prototype, "roomId", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    (0, typeorm_1.Column)({ type: "timestamptz" }),
     __metadata("design:type", Date)
 ], Invite.prototype, "timeOfCheck", void 0);
 __decorate([
     (0, type_graphql_1.Field)(),
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({
+        type: "enum",
+        enum: iStatus,
+        default: iStatus.PENDING
+    }),
     __metadata("design:type", String)
 ], Invite.prototype, "status", void 0);
 __decorate([

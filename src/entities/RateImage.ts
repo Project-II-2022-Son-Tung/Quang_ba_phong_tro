@@ -11,8 +11,12 @@ export class RateImage extends BaseEntity{
 
     @Field(_type => RoomRate)
     @ManyToOne(() => RoomRate, (roomRate) => roomRate.images, { onDelete: "CASCADE" })
-    @JoinColumn()
+    @JoinColumn({ name: "rateId" })
     rate!: RoomRate;
+
+    @Field()
+    @Column()
+    rateId!: string;
 
     @Field()
     @Column()

@@ -26,6 +26,7 @@ const RoomOrderByInput_1 = require("../types/RoomOrderByInput");
 const typeorm_1 = require("typeorm");
 const RoomFilterInput_1 = require("../types/RoomFilterInput");
 const RoomFilterInput_2 = require("../types/RoomFilterInput");
+const RoomRate_1 = require("../entities/RoomRate");
 let RoomResolver = class RoomResolver {
     async images(room) {
         return await RoomImage_1.RoomImage.find({
@@ -91,7 +92,8 @@ let RoomResolver = class RoomResolver {
         const room = await Room_1.Room.findOne({
             where: {
                 id
-            }
+            },
+            relations: ["owner", "ward", "district", "province"]
         });
         if (!room) {
             return {
@@ -100,6 +102,13 @@ let RoomResolver = class RoomResolver {
                 message: "Room not found"
             };
         }
+        ;
+        const rates = await RoomRate_1.RoomRate.find({
+            where: {
+                roomId: room.id
+            }, relations: ["user"]
+        });
+        room.rates = rates;
         return {
             code: 200,
             success: true,

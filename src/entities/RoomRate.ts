@@ -22,13 +22,21 @@ export class RoomRate extends BaseEntity {
 
     @Field(_type => Room)
     @ManyToOne(() => Room, (room) => room.rates, { onDelete: "CASCADE" })
-    @JoinColumn()    
+    @JoinColumn({ name: "roomId" })    
     room!: Room;
+
+    @Field()
+    @Column()
+    roomId: string;
 
     @Field(_type => User)
     @ManyToOne(() => User, (user) => user.rates, { onDelete: "CASCADE" })
-    @JoinColumn()
+    @JoinColumn({ name: "userId" })
     user!: User;
+
+    @Field()
+    @Column()
+    userId: string;
 
     @Field(_type => [RateImage])
     @OneToMany(()=> RateImage, (image) => image.rate)

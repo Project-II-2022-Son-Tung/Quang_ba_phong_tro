@@ -12,6 +12,7 @@ import { RoomOrderByInput } from "../types/RoomOrderByInput";
 import { Between, FindOptionsWhere, In, Like } from "typeorm";
 import { FilterRange} from "../types/RoomFilterInput";
 import { RoomFilterInput } from "../types/RoomFilterInput";
+import { RoomRate } from "../entities/RoomRate";
 
 @Resolver(_of => Room)
 export class RoomResolver {
@@ -91,7 +92,8 @@ export class RoomResolver {
             {
                 where: {
                     id 
-                }
+                }, 
+                relations: ["owner", "ward", "district", "province"]
             }
         );
         if (!room) {
@@ -100,7 +102,13 @@ export class RoomResolver {
                 success: false,
                 message: "Room not found"
             }
-        }
+        };
+        const rates = await RoomRate.find({
+            where: {
+                roomId: room.id
+            }, relations: ["user"]
+        });
+        room.rates = rates;
         return {
             code: 200,
             success: true,

@@ -20,7 +20,9 @@ let RoomRate = class RoomRate extends typeorm_1.BaseEntity {
     rate;
     comment;
     room;
+    roomId;
     user;
+    userId;
     images;
     createdAt;
     updatedAt;
@@ -43,15 +45,25 @@ __decorate([
 __decorate([
     (0, type_graphql_1.Field)(_type => Room_1.Room),
     (0, typeorm_1.ManyToOne)(() => Room_1.Room, (room) => room.rates, { onDelete: "CASCADE" }),
-    (0, typeorm_1.JoinColumn)(),
+    (0, typeorm_1.JoinColumn)({ name: "roomId" }),
     __metadata("design:type", Room_1.Room)
 ], RoomRate.prototype, "room", void 0);
 __decorate([
+    (0, type_graphql_1.Field)(),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], RoomRate.prototype, "roomId", void 0);
+__decorate([
     (0, type_graphql_1.Field)(_type => User_1.User),
     (0, typeorm_1.ManyToOne)(() => User_1.User, (user) => user.rates, { onDelete: "CASCADE" }),
-    (0, typeorm_1.JoinColumn)(),
+    (0, typeorm_1.JoinColumn)({ name: "userId" }),
     __metadata("design:type", User_1.User)
 ], RoomRate.prototype, "user", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], RoomRate.prototype, "userId", void 0);
 __decorate([
     (0, type_graphql_1.Field)(_type => [RateImage_1.RateImage]),
     (0, typeorm_1.OneToMany)(() => RateImage_1.RateImage, (image) => image.rate),

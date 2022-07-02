@@ -136,7 +136,12 @@ export class Room extends BaseEntity {
 
     @Field(_type => Owner)
     @ManyToOne(() => Owner, (owner) => owner.rooms, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "ownerId" })
     owner!: Owner;
+
+    @Field()
+    @Column()
+    ownerId!: string;
 
     @Field(_type => [UserHistory])
     @OneToMany(() => UserHistory, (history) => history.room)

@@ -26,6 +26,42 @@ let RoomFavouriteResolver = class RoomFavouriteResolver {
             }
         });
     }
+    async getUsersFavourited(roomId, ctx) {
+        if ((!ctx.req.session.userId) || ctx.req.session.role !== 'owner') {
+            return null;
+        }
+        const room = await Room_1.Room.findOne({
+            where: {
+                id: roomId
+            },
+            relations: ["owner"]
+        });
+        if ((!room) || room.owner.id !== ctx.req.session.userId) {
+            return null;
+        }
+        const roomFavourites = await RoomFavourite_1.RoomFavourite.find({
+            where: {
+                roomId,
+            },
+        });
+        console.log(roomFavourites);
+        if (!roomFavourites || roomFavourites.length === 0) {
+            return null;
+        }
+        let users = new Array();
+        for (const roomFavourite of roomFavourites) {
+            const user = await User_1.User.findOne({
+                where: {
+                    id: roomFavourite.userId,
+                },
+                relations: ["identification"]
+            });
+            if (user) {
+                users.push(user);
+            }
+        }
+        return users;
+    }
     async isRoomFavourited(roomId, ctx) {
         const userId = ctx.req.session.userId;
         if ((!userId) || ctx.req.session.role !== 'user') {
@@ -70,7 +106,7 @@ let RoomFavouriteResolver = class RoomFavouriteResolver {
         const room = await Room_1.Room.findOne({
             where: {
                 id: roomId
-            }
+            }, relations: ["owner"]
         });
         if (!room) {
             return {
@@ -83,14 +119,14 @@ let RoomFavouriteResolver = class RoomFavouriteResolver {
             user,
             room,
         });
+        await roomFavourite.save();
         return {
             code: 201,
             success: true,
             message: "Room are successfully added to favourites",
-            roomFavourite: await roomFavourite.save(),
         };
     }
-    async deleteRoomFavourite(id, ctx) {
+    async deleteRoomFavourite(roomId, ctx) {
         if ((!ctx.req.session.userId) || ctx.req.session.role !== 'user') {
             return {
                 success: false,
@@ -100,9 +136,9 @@ let RoomFavouriteResolver = class RoomFavouriteResolver {
         }
         const roomFavourite = await RoomFavourite_1.RoomFavourite.findOne({
             where: {
-                id,
+                roomId,
                 userId: ctx.req.session.userId,
-            },
+            }, relations: ["room"]
         });
         if (!roomFavourite) {
             return {
@@ -127,6 +163,14 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], RoomFavouriteResolver.prototype, "countRoomFavourites", null);
 __decorate([
+    (0, type_graphql_1.Query)(_return => [User_1.User], { nullable: true }),
+    __param(0, (0, type_graphql_1.Arg)("roomId")),
+    __param(1, (0, type_graphql_1.Ctx)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], RoomFavouriteResolver.prototype, "getUsersFavourited", null);
+__decorate([
     (0, type_graphql_1.Query)(_return => Boolean),
     __param(0, (0, type_graphql_1.Arg)("roomId")),
     __param(1, (0, type_graphql_1.Ctx)()),
@@ -144,7 +188,7 @@ __decorate([
 ], RoomFavouriteResolver.prototype, "createRoomFavourite", null);
 __decorate([
     (0, type_graphql_1.Mutation)(_return => RoomFavouriteMutationResponse_1.RoomFavouriteMutationResponse),
-    __param(0, (0, type_graphql_1.Arg)("id")),
+    __param(0, (0, type_graphql_1.Arg)("roomId")),
     __param(1, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object]),

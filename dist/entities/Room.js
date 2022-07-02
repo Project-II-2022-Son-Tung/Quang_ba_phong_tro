@@ -53,6 +53,7 @@ let Room = class Room extends typeorm_1.BaseEntity {
     price;
     images;
     owner;
+    ownerId;
     histories;
     rates;
     invites;
@@ -213,8 +214,14 @@ __decorate([
 __decorate([
     (0, type_graphql_1.Field)(_type => Owner_1.Owner),
     (0, typeorm_1.ManyToOne)(() => Owner_1.Owner, (owner) => owner.rooms, { onDelete: "CASCADE" }),
+    (0, typeorm_1.JoinColumn)({ name: "ownerId" }),
     __metadata("design:type", Owner_1.Owner)
 ], Room.prototype, "owner", void 0);
+__decorate([
+    (0, type_graphql_1.Field)(),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Room.prototype, "ownerId", void 0);
 __decorate([
     (0, type_graphql_1.Field)(_type => [UserHistory_1.UserHistory]),
     (0, typeorm_1.OneToMany)(() => UserHistory_1.UserHistory, (history) => history.room),
