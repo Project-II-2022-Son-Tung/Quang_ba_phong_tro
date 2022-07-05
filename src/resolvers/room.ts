@@ -13,6 +13,7 @@ import { Between, FindOptionsWhere, In, Like } from "typeorm";
 import { FilterRange} from "../types/RoomFilterInput";
 import { RoomFilterInput } from "../types/RoomFilterInput";
 import { RoomRate } from "../entities/RoomRate";
+import { ListRoomResponse } from "../types/ListRoomResponse";
 
 @Resolver(_of => Room)
 export class RoomResolver {
@@ -26,13 +27,13 @@ export class RoomResolver {
     }
 
 
-    @Query(_return => [Room])
+    @Query(_return => ListRoomResponse)
     async rooms(
         @Arg("page") page: number,
         @Arg("limit") limit: number,
         @Arg("orderBy", {nullable: true}) orderBy?: RoomOrderByInput,
         @Arg("filter", {nullable: true}) filter?: RoomFilterInput,
-    ): Promise<Room[]> {
+    ): Promise<ListRoomResponse> {
         const realLimit = Math.min(limit, 20);
         let whereFilter: FindOptionsWhere<Room> | FindOptionsWhere<Room>[] = {};
         if (filter) {
@@ -74,6 +75,10 @@ export class RoomResolver {
             }
         }
         console.log(whereFilter);
+        const totalRoom = await Room.count({
+            where: whereFilter
+        });
+        const totalPages = Math.ceil(totalRoom / realLimit);
         const rooms = await Room.find({
             where: whereFilter,
             skip: (page - 1) * realLimit,
@@ -83,7 +88,10 @@ export class RoomResolver {
                  createdAt: "DESC"
             }
         });
-        return rooms;
+        return {
+            rooms,
+            totalPages
+        };
     }
 
     @Query(_return => RoomMutationResponse, {nullable: true})
