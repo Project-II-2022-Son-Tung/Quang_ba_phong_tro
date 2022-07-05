@@ -19,6 +19,8 @@ import { DistrictsResolver } from "./resolvers/district";
 import { WardsResolver } from "./resolvers/ward";
 import { RoomFavouriteResolver } from "./resolvers/roomFavourite";
 import { InviteResolver } from "./resolvers/invite";
+import routes from "./services";
+import { applyRoutes } from "./utils/applyRoute";
 
 
 const main = async () => {
@@ -103,10 +105,7 @@ const main = async () => {
 	apolloServer.applyMiddleware({app, cors: false});
   	const PORT = process.env.PORT || 5000;
   
-	app.post('/auth', (req, res) => {
-		console.log(req.body);
-		res.send('Hello World!');
-	});
+	applyRoutes(routes, app);
   	app.listen(PORT, () => {
     	console.log(`Server started on port ${PORT}. GraphQL server started on localhost:${PORT}${apolloServer.graphqlPath}`);
   	});
