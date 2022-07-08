@@ -17,6 +17,7 @@ import { Room } from "./entities/Room";
 import { RoomFavourite } from "./entities/RoomFavourite";
 import { RoomImage } from "./entities/RoomImage";
 import { RoomRate } from "./entities/RoomRate";
+import { Transaction } from "./entities/Transaction";
 import { User } from "./entities/User";
 import { UserHistory } from "./entities/UserHistory";
 import { Wallet } from "./entities/Wallet";
@@ -26,7 +27,7 @@ export const AppDataSource = new DataSource({
     type: 'postgres',
         ...(__prod__ ?
           {
-            url: process.env.DATABASE_URL,
+            url: process.env.NEW_DATABASE_URL,
           }
           : {
           database: 'QLPT',
@@ -43,7 +44,7 @@ export const AppDataSource = new DataSource({
           ssl: true
         } : {}),
         ...(__prod__ ? {} : {synchronize: true} ),
-        entities: [Admin, User, Owner, UserHistory, RoomRate, RoomImage, Room, RateImage, OwnerRate, OwnerHistory, Invite, Identification, Contract, Wallet, Provinces, Districts, Wards, RoomFavourite],    
+        entities: [Admin, User, Owner, UserHistory, RoomRate, RoomImage, Room, RateImage, OwnerRate, OwnerHistory, Invite, Identification, Contract, Wallet, Provinces, Districts, Wards, RoomFavourite, Transaction],    
         migrations: [path.join(__dirname, '/migrations/*')]
 });
 // export const RedisClient = createClient(

@@ -1,5 +1,6 @@
 import { Field, ID, ObjectType } from "type-graphql";
-import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Transaction } from "./Transaction";
 
 export enum WalletStatus {
     ACTIVE = "ACTIVE",
@@ -34,4 +35,8 @@ export class Wallet extends BaseEntity {
     @Field()
     @UpdateDateColumn({ type: "timestamptz" })
     updatedAt!: Date;
+
+    @Field(_type => [Transaction], { nullable: true })
+    @OneToMany(() => Transaction, (transaction) => transaction.wallet, { cascade: true })
+    transactions?: Transaction[];
 }
