@@ -25,7 +25,7 @@ export class Wallet extends BaseEntity {
     availableBalance!: number;
 
     @Field(_type => String)
-    @Column({type: "enum", enum: WalletStatus, default: WalletStatus.INACTIVE})
+    @Column({type: "enum", enum: WalletStatus, default: WalletStatus.ACTIVE})
     status!: WalletStatus;
 
     @Field()

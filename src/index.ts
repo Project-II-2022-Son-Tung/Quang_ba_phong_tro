@@ -22,6 +22,8 @@ import { InviteResolver } from "./resolvers/invite";
 import routes from "./services";
 import { applyRoutes } from "./utils/applyRoute";
 import { ContractResolver } from "./resolvers/contract";
+import { RoomRateResolver } from "./resolvers/roomRate";
+import { WalletResolver } from "./resolvers/wallet";
 
 
 const main = async () => {
@@ -89,7 +91,7 @@ const main = async () => {
 	
 	const apolloServer = new ApolloServer({
 		schema: await buildSchema({
-		  resolvers: [UserResolver, AdminResolver, OwnerResolver, RoomResolver, ProvincesResolver, DistrictsResolver, WardsResolver, RoomFavouriteResolver, InviteResolver, ContractResolver], 
+		  resolvers: [UserResolver, AdminResolver, OwnerResolver, RoomResolver, ProvincesResolver, DistrictsResolver, WardsResolver, RoomFavouriteResolver, InviteResolver, ContractResolver, RoomRateResolver, WalletResolver], 
 		  validate: false,
 		}),
 		context: ({ req, res }): MyContext => ({ req, res, connection: AppDataSource.manager }),

@@ -1,12 +1,22 @@
 import { Field, ID, ObjectType } from "type-graphql";
-import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Admin } from "./Admin";
 import { Room } from "./Room";
 import { Wallet } from "./Wallet";
 
-export type TransactionDirection = "IN" | "OUT";
-export type TransactionStatus = "PENDING" | "COMPLETED" | "CANCELLED";
-export type TransactionType = "INTERNAL" | "EXTERNAL";
+export enum TransactionDirectionEnum {
+    IN = "IN",
+    OUT = "OUT"
+}
+export enum TransactionStatusEnum {
+    PENDING = "PENDING",
+    COMPLETED = "COMPLETED",
+    CANCELLED = "CANCELLED"
+}
+export enum TransactionTypeEnum {
+    INTERNAL = "INTERNAL",
+    EXTERNAL = "EXTERNAL"
+}
 
 @ObjectType()
 @Entity()
@@ -33,16 +43,16 @@ export class Transaction extends BaseEntity {
     walletId: string;
 
     @Field()
-    @Column({ type: "enum", enum: ["IN", "OUT"], default: "IN" })
-    direction!: TransactionDirection;
+    @Column({ type: "enum", enum: TransactionDirectionEnum, default: TransactionDirectionEnum.IN })
+    direction!: TransactionDirectionEnum;
 
     @Field()
-    @Column({ type: "enum", enum: ["PENDING", "COMPLETED", "CANCELLED"], default: "PENDING" })
-    status!: TransactionStatus;
+    @Column({ type: "enum", enum: TransactionStatusEnum, default: TransactionStatusEnum.PENDING })
+    status!: TransactionStatusEnum;
 
     @Field()
-    @Column({ type: "enum", enum: ["INTERNAL", "EXTERNAL"], default: "INTERNAL" })
-    type!: TransactionType;
+    @Column({ type: "enum", enum: TransactionTypeEnum, default: TransactionTypeEnum.INTERNAL })
+    type!: TransactionTypeEnum;
 
     @Field({ nullable: true })
     @Column({ nullable: true })
@@ -67,7 +77,7 @@ export class Transaction extends BaseEntity {
     admin?: Admin;
     
     @Field()
-    @Column({ type: "timestamptz" })
+    @CreateDateColumn({ type: "timestamptz" })
     createdAt!: Date;
 }
 

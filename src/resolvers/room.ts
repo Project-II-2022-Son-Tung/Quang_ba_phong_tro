@@ -74,7 +74,6 @@ export class RoomResolver {
                 }]
             }
         }
-        console.log(whereFilter);
         const totalRoom = await Room.count({
             where: whereFilter
         });

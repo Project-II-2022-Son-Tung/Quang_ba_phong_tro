@@ -57,6 +57,10 @@ export class User extends BaseEntity {
     @JoinColumn()
     wallet!: Wallet;
 
+    @Field()
+    @Column()
+    walletId!: string;
+
     @Field(_type => [OwnerRate], {nullable: true})
     @OneToMany(() => OwnerRate, (rate) => rate.user)
     rates: OwnerRate[];

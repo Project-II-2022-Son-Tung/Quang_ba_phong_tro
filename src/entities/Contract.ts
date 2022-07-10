@@ -4,7 +4,13 @@ import { Owner } from "./Owner";
 import { Room } from "./Room";
 import { User } from "./User";
 
-export type statusContract = "pending" | "succeeded" | "expired" | "canceled";
+export enum StatusContractEnum {
+    PENDING = "pending",
+    SUCCEEDED = "succeeded",
+    EXPIRED = "expired",
+    CANCELED = "canceled"
+}
+
 
 @ObjectType()
 @Entity()
@@ -39,8 +45,14 @@ export class Contract extends BaseEntity {
     additionalAgreements!: string;
 
     @Field()
-    @Column()
-    status!: statusContract;
+    @Column(
+        {
+            type: "enum",
+            enum: StatusContractEnum,
+            default: StatusContractEnum.PENDING
+        }
+    )
+    status!: StatusContractEnum;
 
     @Field(_type => Room)
     @ManyToOne(() => Room, (room) => room.contracts, { onDelete: "CASCADE" })
