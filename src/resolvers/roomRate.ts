@@ -8,6 +8,7 @@ import { Invite, iStatus } from "../entities/Invite";
 import { RateImage } from "../entities/RateImage";
 import { UpdateRoomRateInput } from "../types/UpdateRoomRateInput";
 import { deleteImage } from "../services/file-upload/provider/imageProvider";
+import { Room } from "../entities/Room";
 
 @Resolver(_of => RoomRate)
 export class RoomRateResolver {
@@ -80,18 +81,28 @@ export class RoomRateResolver {
 
         const connection = ctx.connection;
         return await connection.transaction(async transactionEntityManager =>{
-            try {
+            try {                
                 const roomRate = await transactionEntityManager.create(RoomRate, {
                     rate: rateInput.rate,
                     roomId: rateInput.roomId,
                     comment: rateInput.comment,
                     userId: ctx.req.session!.userId,
                 }).save();
+
                 rateInput.images.forEach(async (image) => {
                     await transactionEntityManager.create(RateImage, {
                         imageUrl: image,
                         rate: roomRate,
                     }).save();
+                });
+
+                const avgRate = (await transactionEntityManager.query(
+                    `SELECT AVG(rate)::numeric(10,2) FROM room_rate WHERE roomId = '${rateInput.roomId}'`
+                ));
+                await transactionEntityManager.update(Room, {
+                    id: rateInput.roomId,
+                }, {
+                    rate: avgRate[0]["avg"]
                 });
                 return {
                     code: 200,
