@@ -32,6 +32,7 @@ export class RoomRateResolver {
             where: { roomId },
             skip: (page - 1) * realLimit,
             take: realLimit,
+            relations: ["user", "images"]
         });
         const total = await RoomRate.count();
         const totalPages = Math.ceil(total / realLimit);
@@ -142,30 +143,33 @@ export class RoomRateResolver {
                 await transactionEntityManager.update(RoomRate, {
                     id: rateInput.id,
                 }, {
-                    rate: rateInput.rate,
-                    comment: rateInput.comment,
+                    rate: rateInput.rate ? rateInput.rate : roomRate.rate,
+                    comment: rateInput.comment ? rateInput.comment : roomRate.comment,
                 });
-                const existingImages = await transactionEntityManager.find(RateImage, {
-                    where: {
-                        rateId: rateInput.id,
-                    }
-                });
-                const media_link = `https://${process.env.AWS_BUCKET_NAME || "quang-ba-phong-tro"}.s3.${process.env.AWS_BUCKET_REGION || "ap-southeast-1"}.amazonaws.com/`;
-                existingImages.forEach(async (image) => {
-                    if (image.imageUrl.startsWith(media_link)) {
-                        const response = await deleteImage(image.imageUrl.replace(media_link, ""));
-                        if (response[0]) {
-                            throw new Error(response[0].message);
+                if(rateInput.images) {
+                    const existingImages = await transactionEntityManager.find(RateImage, {
+                        where: {
+                            rateId: rateInput.id,
                         }
-                    }
-                    await transactionEntityManager.remove(image);
-                });
-                rateInput.images.forEach(async (image) => {
-                    await transactionEntityManager.create(RateImage, {
-                        imageUrl: image,
-                        rate: roomRate,
-                    }).save();
-                });
+                    });
+                    const media_link = `https://${process.env.AWS_BUCKET_NAME || "quang-ba-phong-tro"}.s3.${process.env.AWS_BUCKET_REGION || "ap-southeast-1"}.amazonaws.com/`;
+                    console.log(media_link);
+                    existingImages.forEach(async (image) => {
+                        if (image.imageUrl.startsWith(media_link)) {
+                            const response = await deleteImage(image.imageUrl.replace(media_link, ""));
+                            if (response[0]) {
+                                throw new Error(response[0].message);
+                            }
+                        }
+                        await transactionEntityManager.remove(image);
+                    });
+                    rateInput.images.forEach(async (image) => {
+                        await transactionEntityManager.create(RateImage, {
+                            imageUrl: image,
+                            rate: roomRate,
+                        }).save();
+                    });
+                }
                 return {
                     code: 200,
                     success: true,

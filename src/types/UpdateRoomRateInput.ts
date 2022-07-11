@@ -1,24 +1,28 @@
-import { IsNumber, IsPositive, IsString, IsUUID } from "class-validator";
+import { IsNumber, IsOptional, IsPositive, IsString, IsUUID } from "class-validator";
 import { Field, ID, InputType } from "type-graphql";
 
 @InputType()
 export class UpdateRoomRateInput{
 
-    @Field(_type => ID)
+    @Field(_type => ID, { nullable: true })
+    @IsOptional()
     @IsUUID()
     id!: string;
 
-    @Field()
+    @Field({ nullable: true })
+    @IsOptional()
     @IsPositive()
     @IsNumber()
-    rate!: number;
+    rate?: number;
 
-    @Field()
+    @Field({nullable: true})
+    @IsOptional()
     @IsString()
-    comment!: string;
+    comment?: string;
 
-    @Field(_type => [String])
+    @Field(_type => [String], { nullable: true })
+    @IsOptional()
     @IsString({ each: true })
-    images!: string[];
+    images?: string[];
     
 }
