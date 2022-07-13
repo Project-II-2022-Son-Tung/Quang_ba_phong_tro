@@ -128,6 +128,20 @@ export class RoomFavouriteResolver {
             };
         }
 
+        const existingRoomFavourite = await RoomFavourite.findOne({
+            where: {
+                userId: ctx.req.session.userId,
+                roomId
+            }
+        });
+        if (existingRoomFavourite) {
+            return {
+                code: 400,
+                success: false,
+                message: "Room favourite already exists",
+            };
+        }
+
         const roomFavourite = RoomFavourite.create({
             user,
             room,

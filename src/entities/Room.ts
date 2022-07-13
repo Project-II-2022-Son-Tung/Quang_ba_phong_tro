@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType } from "type-graphql";
+import { Field, Float, ID, ObjectType } from "type-graphql";
 import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Contract } from "./Contract";
 import { Districts } from "./Districts";
@@ -18,9 +18,13 @@ export class Room extends BaseEntity {
     @PrimaryGeneratedColumn("uuid")
     id!: string;
 
-    @Field({nullable: true})
-    @Column({nullable: true})
+    @Field(_type => Float, {nullable: true})
+    @Column({type: "float4", nullable: true})
     rate: number;
+
+    @Field()
+    @Column({type: "integer", default: 0})
+    numberOfRates: number;
 
     @Field()
     @Column()

@@ -21,13 +21,21 @@ export class OwnerRate extends BaseEntity {
 
     @Field(_type=>Owner)
     @ManyToOne(() => Owner, (owner) => owner.rates, { onDelete: "CASCADE" })
-    @JoinColumn()    
+    @JoinColumn({ name: "ownerId"})    
     owner!: Owner;
+
+    @Field()
+    @Column()
+    ownerId: string;
 
     @Field(_type=>User)
     @ManyToOne(() => User, (user) => user.rates, { onDelete: "CASCADE" })
-    @JoinColumn()
+    @JoinColumn({ name: "userId" })
     user!: User;
+
+    @Field()
+    @Column()
+    userId: string;
 
     @Field()
     @CreateDateColumn({ type: "timestamptz" })

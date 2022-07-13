@@ -3,7 +3,7 @@ import { Wallet } from "./Wallet"
 import { Contract } from "./Contract";
 import { OwnerRate } from "./OwnerRate";
 import { Room } from "./Room";
-import { Field, ID, ObjectType } from 'type-graphql'
+import { Field, Float, ID, ObjectType } from 'type-graphql'
 import { Identification } from "./Identification";
 import { OwnerHistory } from "./OwnerHistory";
 import { Invite } from "./Invite";
@@ -35,8 +35,8 @@ export class Owner extends BaseEntity {
     @Column({select: false})
     password!: string;
 
-    @Field()
-    @Column({nullable: true})
+    @Field(_type => Float, {nullable: true})
+    @Column({type: "float4", nullable: true})
     rate: number;
 
     @Field()
@@ -68,6 +68,10 @@ export class Owner extends BaseEntity {
     @Field(_type => [OwnerRate], {nullable: true})
     @OneToMany(() => OwnerRate, (rate) => rate.owner)
     rates: OwnerRate[];
+
+    @Field()
+    @Column({type: "integer", default: 0})
+    numberOfRates: number;
 
     @Field(_type => [Contract], {nullable: true})
     @OneToMany(() => Contract, (contract) => contract.owner)

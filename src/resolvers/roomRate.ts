@@ -56,6 +56,20 @@ export class RoomRateResolver {
             }
         }
 
+        const room = await Room.findOne({
+            where: {
+                id: rateInput.roomId,
+            }
+        });
+
+        if(!room) {
+            return {
+                code: 400,
+                success: false,
+                message: "Room does not exist"
+            }
+        }
+
         const invitation = await Invite.findOne({
             where: {
                 roomId: rateInput.roomId,
@@ -79,6 +93,21 @@ export class RoomRateResolver {
             }
         }
 
+        const existingRoomRate = await RoomRate.findOne({
+            where: {
+                roomId: rateInput.roomId,
+                userId: ctx.req.session!.userId,
+            }
+        });
+
+        if(existingRoomRate) {
+            return {
+                code: 400,
+                success: false,
+                message: "You have already rated this room, please update it"
+            }
+        }
+
         const connection = ctx.connection;
         return await connection.transaction(async transactionEntityManager =>{
             try {                
@@ -96,14 +125,19 @@ export class RoomRateResolver {
                     }).save();
                 });
 
-                const avgRate = (await transactionEntityManager.query(
-                    `SELECT AVG(rate)::numeric(10,2) FROM room_rate WHERE roomId = '${rateInput.roomId}'`
-                ));
-                await transactionEntityManager.update(Room, {
-                    id: rateInput.roomId,
-                }, {
-                    rate: avgRate[0]["avg"]
-                });
+                if(room.numberOfRates === 0) {
+                    await transactionEntityManager.update(Room, room.id, {
+                        rate: rateInput.rate,
+                        numberOfRates: 1,
+                    });
+                } else {
+                    const newRate = (room.rate * room.numberOfRates + rateInput.rate) / (room.numberOfRates + 1);
+                    await transactionEntityManager.update(Room, room.id, {
+                        rate: parseFloat((newRate).toFixed(2)),
+                        numberOfRates: room.numberOfRates + 1,
+                    });
+                }
+                
                 return {
                     code: 200,
                     success: true,
@@ -137,7 +171,7 @@ export class RoomRateResolver {
             where: {
                 id: rateInput.id,
                 userId: ctx.req.session!.userId,
-            }
+            }, relations: ["room"]
         });
 
         if(!roomRate) {
@@ -148,6 +182,15 @@ export class RoomRateResolver {
             }
         }
 
+        if(!roomRate?.room) {
+            return {
+                code: 400,
+                success: false,
+                message: "Room does not exist"
+            }
+        }
+
+
         const connection = ctx.connection;
         return await connection.transaction(async transactionEntityManager =>{
             try {
@@ -157,6 +200,20 @@ export class RoomRateResolver {
                     rate: rateInput.rate ? rateInput.rate : roomRate.rate,
                     comment: rateInput.comment ? rateInput.comment : roomRate.comment,
                 });
+                if (rateInput.rate !== roomRate.rate) {
+                    const avgRate = (await transactionEntityManager.createQueryBuilder()
+                        .select("avg(rate)::numeric(10,2)")
+                        .from(RoomRate, "roomRate")
+                        .where("roomRate.roomId = :roomId", { roomId: roomRate.roomId })
+                        .getRawOne()
+                        );
+                        
+                    await transactionEntityManager.update(Room, {
+                        id: roomRate.roomId,
+                    }, {
+                        rate: (avgRate["avg"])
+                    });
+                }
                 if(rateInput.images) {
                     const existingImages = await transactionEntityManager.find(RateImage, {
                         where: {
