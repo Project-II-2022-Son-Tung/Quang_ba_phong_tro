@@ -156,6 +156,8 @@ export class UserResolver {
                     email: usernameOrEmail,
                     username: usernameOrEmail,
                 })
+                .leftJoinAndSelect("user.identification", "identification")
+                .leftJoinAndSelect("user.wallet", "wallet")
                 .addSelect("user.password")
                 .getOne();
             if(!existingUser) {
