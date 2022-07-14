@@ -45,7 +45,7 @@ export class UserResolver {
             where: {
                 userId: user.id
             },
-            relations: ["room"]
+            relations: ["room", "room.owner", "room.district", "room.province", "room.owner"]
         });
     }
         
