@@ -43,6 +43,23 @@ export class RoomRateResolver {
         };
     }
 
+    @Query(_return => RoomRate, { nullable: true })
+    async myRoomRate(
+        @Arg("roomId") roomId: string,
+        @Ctx() ctx: MyContext
+    ): Promise<RoomRate | null> {
+        if( !ctx.req.session!.userId || ctx.req.session.role !== "user" ) {
+            return null;
+        }
+
+        return await RoomRate.findOne({
+            where: {
+                roomId,
+                userId: ctx.req.session!.userId,
+            }
+        });
+    }
+
     @Mutation(_return => RoomRateMutationResponse)
     async createRoomRate(
         @Arg("rateInput") rateInput: CreateRoomRateInput,
@@ -253,6 +270,8 @@ export class RoomRateResolver {
         });     
 
     }
+
+
     
 
 
