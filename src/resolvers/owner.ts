@@ -200,22 +200,6 @@ export class OwnerResolver {
     }
 
     @Mutation(_return => Boolean)
-    logout(
-        @Ctx() ctx: MyContext
-    ) : Promise<boolean> {
-        return new Promise((resolve, _reject) => {
-            ctx.res.clearCookie(COOKIE_NAME);
-            ctx.req.session.destroy(err => {
-                if(err) {
-                    console.log(err);
-                    resolve(false);
-                }
-                resolve(true);
-            });
-        })
-    }
-
-    @Mutation(_return => Boolean)
     async forgotPasswordOwner(
         @Arg("forgotPasswordInput") forgotPasswordInput: ForgotPasswordInput
     ) : Promise<boolean> {
