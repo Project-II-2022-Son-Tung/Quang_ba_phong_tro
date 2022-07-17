@@ -5,7 +5,6 @@ import { OwnerMutationResponse } from "../types/OwnerMutationResponse";
 import { validateRegisterInput } from "../utils/validateRegisterInput";
 import { LoginInput } from "../types/LoginInput";
 import { MyContext } from "../types/MyContext";
-import { COOKIE_NAME } from "../constants";
 import { ForgotPasswordInput } from "../types/ForgotPassword";
 import { sendEmail } from "../utils/sendEmail";
 import { TokenModel } from "../models/Token";
