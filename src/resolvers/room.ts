@@ -93,6 +93,38 @@ export class RoomResolver {
         };
     }
 
+    @Query(_return => ListRoomResponse)
+    async myRooms(
+        @Ctx() ctx: MyContext,
+        @Arg("page") page: number,
+        @Arg("limit") limit: number,
+        @Arg("orderBy", {nullable: true}) orderBy?: RoomOrderByInput,
+    ): Promise<ListRoomResponse> {
+        const realLimit = Math.min(limit, 20);
+        const totalRoom = await Room.count({
+            where: {
+                ownerId: ctx.req.session!.userId
+            }
+        });
+        const totalPages = Math.ceil(totalRoom / realLimit);
+        const rooms = await Room.find({
+            where: {
+                ownerId: ctx.req.session!.userId
+            },
+            skip: (page - 1) * realLimit,
+            take: realLimit,
+            relations: ["ward", "district", "province"],
+            order: orderBy ? orderBy : {
+                    createdAt: "DESC"
+                }
+        });
+        return {
+            rooms,
+            totalPages
+        };
+    }
+
+
     @Query(_return => RoomMutationResponse, {nullable: true})
     async room(@Arg("id") id: string): Promise<RoomMutationResponse> {
         const room = await Room.findOne(
