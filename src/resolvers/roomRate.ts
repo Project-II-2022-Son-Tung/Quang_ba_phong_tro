@@ -91,10 +91,11 @@ export class RoomRateResolver {
             where: {
                 roomId: rateInput.roomId,
                 userId: ctx.req.session!.userId,
+                status: iStatus.ACCEPTED,
             }
         });
 
-        if(!invitation || invitation.status !== iStatus.ACCEPTED) {
+        if(!invitation) {
             return {
                 code: 400,
                 success: false,
