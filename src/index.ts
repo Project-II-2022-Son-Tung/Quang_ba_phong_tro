@@ -55,7 +55,7 @@ const main = async () => {
 			url: process.env.REDISCLOUD_URL,
 			legacyMode: true
 		} : {
-			url: `redis://localhost:6379`,
+			url: process.env.REDIS_URL,
 			legacyMode: true
 		}
 	);
